@@ -37,6 +37,12 @@ public:
 	template <typename T>
 	static T* GetWorldSettingsAs(UObject* InWorldContextObject);
 
+	template <typename TComponent>
+	static TComponent* GetComponent(const AActor* InActor);
+
+	template <typename TComponent>
+	static TArray<TComponent*> GetComponents(const AActor* InActor);
+
 	UFUNCTION(BlueprintCallable, Category = "GameBase", meta = (WorldContext = "InWorldContextObject"))
 	static FVector2D GetMousePosition(UObject* InWorldContextObject);
 	
@@ -145,6 +151,28 @@ T* UGameBaseFunctionLibrary::GetWorldSettingsAs(UObject* InWorldContextObject)
 	check(InWorldContextObject->GetWorld());
 
 	return Cast<T>(InWorldContextObject->GetWorld()->GetWorldSettings());
+}
+
+template <typename TComponent>
+TComponent* UGameBaseFunctionLibrary::GetComponent(const AActor* InActor)
+{
+	check(InActor);
+
+	return Cast<TComponent>(InActor->GetComponentByClass(TComponent::StaticClass()));
+}
+
+template <typename TComponent>
+static TArray<TComponent*>
+UGameBaseFunctionLibrary::GetComponents(const AActor* InActor)
+{
+	check(InActor);
+
+	TArray<TComponent*> Result;
+	TArray<UActorComponent*> Components;
+	for (auto Component : Components)
+		Result.Add(Cast<TComponent>(Component));
+
+	return Result;
 }
 
 template <typename T>
