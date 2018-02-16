@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "Net/UnrealNetwork.h"
+#include "Interface.h"
 
 #include "ReplicatorInterface.generated.h"
 

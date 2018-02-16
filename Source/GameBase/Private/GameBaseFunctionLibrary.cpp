@@ -105,3 +105,35 @@ void UGameBaseFunctionLibrary::GetBoundsPoints(AActor* InActor, TArray<FVector>&
 		Max
 	};
 }
+
+FBox UGameBaseFunctionLibrary::Encompass(const FBox& InSource, const FVector& InPoint)
+{
+	FVector Min = InSource.Min;
+	FVector Max = InSource.Max;
+
+	Min.X = FMath::Min(Min.X, InPoint.X);
+	Min.Y = FMath::Min(Min.Y, InPoint.Y);
+	Min.Z = FMath::Min(Min.Z, InPoint.Z);
+
+	Max.X = FMath::Max(Max.X, InPoint.X);
+	Max.Y = FMath::Max(Max.Y, InPoint.Y);
+	Max.Z = FMath::Max(Max.Z, InPoint.Z);
+
+	return FBox(Min, Max);
+}
+
+FBox UGameBaseFunctionLibrary::Encompass(const FBox& InSource, const FBox& InOther)
+{
+	FVector Min = InSource.Min;
+	FVector Max = InSource.Max;
+
+	Min.X = FMath::Min(Min.X, InOther.Min.X);
+	Min.Y = FMath::Min(Min.Y, InOther.Min.Y);
+	Min.Z = FMath::Min(Min.Z, InOther.Min.Z);
+
+	Max.X = FMath::Max(Max.X, InOther.Max.X);
+	Max.Y = FMath::Max(Max.Y, InOther.Max.Y);
+	Max.Z = FMath::Max(Max.Z, InOther.Max.Z);
+
+	return FBox(Min, Max);
+}

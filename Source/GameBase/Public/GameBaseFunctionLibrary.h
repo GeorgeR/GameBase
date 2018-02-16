@@ -5,9 +5,9 @@
 
 #include "GameBaseFunctionLibrary.generated.h"
 
-#define HAS_FLAG(Value, Flag) (((Value & static_cast<uint8>(Flag))) == static_cast<uint8>(Flag))
-#define ADD_FLAG(Value, Flag) Value |= static_cast<uint8>(Flag)
-#define REMOVE_FLAG(Value, Flag) Value &= ~static_cast<uint8>(Flag)
+#define HasFlag(Value, Flag) (((Value & static_cast<uint8>(Flag))) == static_cast<uint8>(Flag))
+#define AddFlag(Value, Flag) Value |= static_cast<uint8>(Flag)
+#define RemoveFlag(Value, Flag) Value &= ~static_cast<uint8>(Flag)
 
 UCLASS()
 class GAMEBASE_API UGameBaseFunctionLibrary 
@@ -69,6 +69,13 @@ public:
 
 	template <typename TComponent>
 	static bool ForComponent(AActor* InActor, TFunction<void(TComponent*)> InFunc);
+
+	template <typename T>
+	TArray<T> Splice(TArray<T>& InSource, int32 InStart, int32 InEnd);
+
+	FBox Encompass(const FBox& InSource, const FVector& InPoint);
+
+	FBox Encompass(const FBox& InSource, const FBox& InOther);
 };
 
 template <typename T>
@@ -206,4 +213,12 @@ bool UGameBaseFunctionLibrary::ForComponent(AActor* InActor, TFunction<void(TCom
 	InFunc(Component);
 
 	return true;
+}
+
+template <typename T>
+TArray<T> UGameBaseFunctionLibrary::Splice(TArray<T>& InSource, int32 InStart, int32 InEnd)
+{
+	TArray<T> Result;
+	Result.Append(InSource.GetData()[InStart], InEnd - InStart);
+	return Result;
 }

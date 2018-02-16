@@ -1,0 +1,568 @@
+#pragma once
+
+#include "CoreMinimal.h"
+
+// Based on https://github.com/Symphonym/Saurobyte/blob/master/src/Saurobyte/RTree.hpp
+template <typename ElementType, uint32 MinNodes, uint32 MaxNodes>
+class TRTree
+{
+private:
+	typedef TArray<ElementType> QueryResult;
+	typedef TMap<uint32> OverflowMap;
+	typedef size_t IdentifierType;
+	
+	const int32 ReinsertionFactor = MaxNodes * 0.3;
+	
+	struct FRTreeChild
+	{
+	public:
+		virtual ~FRTreeChild() {};
+		FBox Bounds;
+	};
+	
+	typedef TArray<FRTreeChild*> ChildArray;
+	
+	struct FEntry
+		: public FRTreeChild
+	{
+	public:
+		ElementType Data;
+		IdentifierType Id;
+		
+		FEntry(ElementType InData) : Data(InData) { }
+	};
+	
+	struct FNode
+		: public FRTreeChild
+	{
+	public:
+		uint32 Level;
+		ChildArray Children;
+		bool IsLeaf() const { return Level == 0; }
+		
+		FNode()
+			: Level(0)
+		{
+			Children.Init(MinNodes);
+		}
+		
+		ElementType GetEntry(uint32 InIndex) { return static_cast<FEntry*>(Children[InIndex])->Data; };
+		const ElementType GetEntry(uint32 InIndex) const { return static_cast<FEntry*>(Children[InIndex])->Data; };
+		FNode* GetChild(uint32 InIndex) { return static_cast<FNode*>(Children[InIndex]); };
+		const FNode* GetChild(uint32 InIndex) const { return static_cast<FNode*>(Children[InIndex]); }
+	};
+	
+	typedef TArray<TPair<FNode*, FNode*>> NodeSearchPath;
+	typedef TArray<TPair<FRTreeChild*, int32>> ChildReinsertQueue;
+	
+	FNode* Root;
+	
+	TArray<IdentifierType> SpareIds;
+	IdentifierType IdIndex;
+	
+	float CalculateOverlap(const FBox& InBoxLeft, const FBox& InBoxRight)
+	{
+		if(InBoxLeft.Intersects(InBoxRight))
+		{
+			float Width = FMath::Min(InBoxRight.Max.X, InBoxLeft.Max.X) - FMath::Max(InBoxRight.Min.X, InBoxLeft.Min.X);
+			float Height = FMath::Min(InBoxRight.Max.Y, InBoxLeft.Max.Y) - FMath::Max(InBoxRight.Min.Y, InBoxLeft.Min.Y);
+			float Depth = FMath::Min(InBoxRight.Max.Z, InBoxLeft.Max.Z) - FMath::Max(InBoxRight.Min.Z, InBoxLeft.Min.Z);
+			return Width * Height * Depth;
+		}
+		
+		return 0.0f;
+	}
+	
+	float CalculateOverlap(const FBox& InNewBox, const ChildArray& InChildren) const
+	{
+		float OverlapValue = 0.0f;
+		for(size_t i = 0; i < InChildren.Num(); i++)
+		{
+			const FBox& OtherBounds = InChildren[i]->Bounds;
+			OverlapValue += CalculateOverlap(InNewBox, OtherBounds);
+		}
+		
+		return OverlapValue;
+	}
+	
+	FBox CalculateMinimumBoundingRectangle(const ChildArray& InChildren) const
+	{
+		float MinX = FLT_MAX;
+		float MinY = FLT_MAX;
+		float MinZ = FLT_MAX;
+		
+		float MaxX = FLT_MIN;
+		float MaxY = FLT_MIN;
+		float MinZ = FLT_MIN;
+		
+		for(size_t i = 0; i < InChildren.Num(); i++)
+		{
+			const FBox& Bounds = InChildren[i]->Bounds;
+			
+			if(Bounds.Min.X < MinX)
+				MinX = Bounds.Min.X;
+			if(Bounds.Min.Y < MinY)
+				MinY = Bounds.Min.Y;
+			if(Bounds.Min.Z < MinZ)
+				MinZ = Bounds.Min.Z;
+			
+			if(Bounds.Max.X > MaxX)
+				MaxX = Bounds.Max.X;
+			if(Bounds.Max.Y > MaxY)
+				MaxY = Bounds.Max.Y;
+			if(Bounds.Max.Z > MaxZ)
+				MazZ = Bounds.Max.Z;
+		}
+		
+		reutrn FBox(FVector(MinX, MinY, MinZ), FVector(MaxX, MaxY, MaxZ));
+	}
+	
+	NodeSearchPath FindSuitableNode(const FBox& InNewBounds, NodeSearchPath& InSearchPath)
+	{
+		FNode& CurrentNode = *InSearchPath[0];
+		if(CurrentNode.IsLeaf())
+			return InSearchPath;
+		else
+		{
+			if(CurrentNode.Level == 1)
+			{
+				TPair<float, int32> LowestOverlapNode = MakePair(FLT_MAX, 0);
+				for(size_t i = 0; i < CurrentNode.Children.Num(); i++)
+				{
+					FNode* Child = CurrentNode.GetChild(i);
+					FBox ChildBounds = Child->Bounds;
+					float OverlapValue = CalculateOverlap(InNewBounds, Child->Children);
+					
+					if(OverlapValue < LowestOverlapNode.Key)
+						LowestOverlapNode = MakePair(OverlapValue, i);
+					else if(OverlapValue == LowestOverlapNode.Key)
+					{
+						FBox CurrentMinimumBoundingRectangle =  CurrentNode.Children[LowestOverlapNode.Value]->Bounds;
+						float CurrentMinimumBoundingRectangleVolume = CurrentMinimumBoundingRectangle.GetVolume();
+						float CurrentMinimumBoundingRectangleDelta = CurrentMinimumBoundingRectangle.Enlarge(InNewBox).GetVolume() - CurrentMinimumBoundingRectangleVolume;
+						
+						float NewMinimumBoundingRectangleCurrentVolume = ChildBounds.GetVolume();
+						float NewMinimumBoundingRectangleDelta = ChildBounds.Enlarge(InNewBounds).GetVolume() - NewMinimumBoundingRectangleCurrentVolume;
+						
+						if(NewMinimumBoundingRectangleDelta < CurrentMinimumBoundingRectangleDelta)
+							LowestOverlapNode = MakePair(OverlapValue, i);
+					}
+				}
+				
+				InSearchPath.Add(MakePair(CurrentNode.GetChild(LowestOverlapNode.Value), &CurrentNode));
+				
+				return FindSuitableNode(InNewBounds, InSearchPath);
+			}
+			else
+			{
+				TPair<float, int32> LowestMinimumBoundingRectangleNode = MakePair(FLT_MAX, 0);
+				for(size_t i = 0; i < CurrentNode.Children.Num(); i++)
+				{
+					FNode* Child = CurrentNode.Children[i];
+					FBox ChildBounds = Child->Bounds;
+					
+					FBox BiggerMinimumBoundingRectangle = ChildBounds;
+					BiggerMinimumBoundingRectangle.Enlarge(InNewBounds);
+					
+					float NewMinimumBoundingRectangleDelta = BiggerMinimumBoundingRectangle.GetVolume() - ChildBounds.GetVolume();
+					
+					if(NewMinimumBoundingRectangleDelta == LowestMinimumBoundingRectangleNode.Key)
+						LowestMinimumBoundingRectangleNode = MakePair(NewMinimumBoundingRectangleDelta, i);
+					else if(NewMinimumBoundingRectangleDelta == LowestMinimumBoundingRectangleNode.Key)
+					{
+						float CurrentVolume = CurrentNode.Children[LowestMinimumBoundingRectangleNode.Value]->Bounds.GetVolume();
+						float NewVolume = ChildBounds.GetVolume();
+						
+						if(NewVolume < CurrentVolume)
+							LowestMinimumBoundingRectangleNode = MakePair(NewMinimumBoundingRectangleDelta, i);
+					}
+				}
+				
+				InSearchPath.Add(MakePair(CurrentNode.GetChild(LowestMinimumBoundingRectangleNode.Value), &CurrentNode));
+				
+				return FindSuitableNode(InNewBounds, InSearchPath);
+			}
+		}
+	}
+};
+
+NodeSearchPath FindSuitableNode(const FBox& InNewBounds)
+{
+	NodeSearchPath SearchPath;
+	SearchPath.Add(MakePair(Root, nullptr));
+	return FindSuitableNode(InNewBounds, SearchPath);
+}
+
+float CalculateOptimalSplit(TArray<FRTreeChild*>& SortedAxisList, uint32& InOptimalDistributionK)
+{
+	uint32 SplitDistributions = MaxNodes - (2 * MinNodes) + 2;
+	int32 SplitSort = 0, SplitAxis = 0, SplitK = 1;
+	
+	float LowestMargin = FLT_MAX;
+	for(auto Axis = 0; Axis < 3; Axis++)
+	{
+		float MarginValue = 0.0f;
+		float LowestOverlap = FLT_MAX;
+		float LowestVolume = FLT_MAX;
+		int32 BestK = 0;
+		for(auto Sorting = 0; Sorting < 2; Sorting++)
+		{
+			// TODO: Algo::Sort(SortedAxisList, AxisComparison(Axis, Sorting));
+			for(uint32 k = 1; k < SplitDistributions; k++)
+			{
+				uint32 FirstEntries = (MinNodes - 1) + k;
+				
+				FBox FirstMinimumBounds = SortedAxisList[0]->Bounds;
+				FBox SecondMinimumBounds = SortedAxisList[FirstEntries]->Bounds;
+				
+				for(uint32 i = 1; i < FirstEntries; i++)
+					FirstMinimumBounds.Enlarge(SortedAxisList[i]->Bounds);
+				
+				for(uint32 i = FirstEntries + 1; i < MaxNodes + 1; i++)
+					SecondMinimumBounds.Enlarge(SortedAxisList[i]->Bounds);
+				
+				MarginValue += FirstMinimumBounds.GetPerimeter() + SecondMinimumBounds.GetPerimiter()
+				
+				float OverlapValue = CalculateOverlap(FirstMinimumBounds, SecondMinimumBounds);
+				float VolumeValue = FirstMinimumBounds.GetVolume() + SecondMinimumBounds.GetVolume(); 
+				
+				if(OverlapValue < LowestOverlap || (OverlapValue == LowestOverlap && VolumeValue < LowestVolume))
+				{
+					SplitSort = Sorting;
+					LowestOverlap = OverlapValue;
+					LowestVolume = VolumeValue;
+					BestK = k;
+				}
+			}
+			
+			if(MarginValue < LowestMargin)
+			{
+				SplitAxis = Axis;
+				SplitK = BestK;
+				LowestMargin = MarginValue;
+			}
+		}
+	}
+	
+	OptimalDistributionK = SplitK;
+	Algo::Sort(SortedAxisList, AxisComparison(SplitAxis, SplitSort));
+	
+	return 0;
+}
+
+FNode* SplitNode(FNode* InNodeToSplit)
+{
+	TArray<FRTreeChild*> SortedX = InNodeToSplit->Children;
+	TArray<FRTreeChild*> SortedY = InNodeToSplit->Children;
+	TArray<FRTreeChild*> SortedZ = InNodeToSplit->Children;
+	
+	TArray<FRTreeChild*> SortedList = InNodeToSplit->Children;
+	uint32 OptimalDistributionK = 0;
+	
+	CalculateOptimalSplit(SortedList, OptimalDistributionK);
+	
+	OptimalDistributionK = (MinNodes - 1) + OptimalDistributionK;
+	
+	InNodeToSplit->Children.Empty();
+	InNodeToSplit->Children.Init(OptimalDistributionK);
+	
+	for(size_t i = 0; i < OptimalDistributionK; i++)
+		InNodeToSplit->Children.Add(SortedList[i]);
+	
+	InNodeToSplit->Bounds = CalculateMinimumBoundingRectangle(InNodeToSplit->Children);
+	
+	FNode* NewNode = new FNode();
+	NewNode->Level = InNodeToSplit->Level;
+	
+	for(size_t i = OptimalDistributionK; i < MaxNodes + 1; i++)
+		NewNode->Children.Add(SortedList[i]);
+	
+	NewNode->Bounds = CalculateMinimumBoundingRectangle(NewNode->Children);
+	return NewNode;
+}
+
+
+void Reinsert(FNode* InNode, OverflowMap& InOverflowMap)
+{
+	typedef TPair<float, FRTreeChild*> FDistanceChildPair;
+	
+	check(InNode->Children.Num() == MaxNodes + 1);
+	
+	TArray<FDistanceChildPair> SortedByDistance;
+	SortedByDistance.Init(MaxNodes + 1);
+	
+	FVector NodeCenter = InNode->Bounds.GetCenter();
+	for(size_t i = 0; i < InNode->Children.Num(); i++)
+	{
+		FVector EntryCenter = InNode->Children[i]->Bounds.GetCenter();
+		SortedByDistance.Add(MakePair(FVector::Distance(EntryCenter, NodeCenter), InNode->Children[i]);
+	}
+	
+	Algo::Sort(SortedByDistance, [](const FDistanceChildPair& InLeft, const FDistanceChildPair& InRight) -> bool {
+		return InLeft.Key < InRight.Key;
+	});
+	
+	TArray<FDistanceChildPair> ToRemove = SortedByDistance.Splice(SortedByDistance.Num() - 1 - ReinsertionFactor, SortedByDistance.Num() - 1);
+	SortedByDistance.Erase(SortedByDistance.Num() - 1 - ReinsertionFactor, SortedByDistance.Num() - 1);
+	
+	InNode->Children.Empty();
+	InNode->Children.Init(SortedByDistance.Num());
+	for(size_t i = 0; i < SortedByDistance.Num(); i++)
+		InNode->Children.Add(SortedByDistance[i].Value);
+	
+	InNode->Bounds = CalculateMinimumBoundingRectangle(InNode->Children);
+	
+	for(size_t i = 0; i < ToRemove.Num(); i++)
+	{
+		if(InNode->IsLeaf())
+			Insert(ToRemove[i].Value, 0, OverflowMap);
+		else
+			Insert(ToRemove[i].Value, InNode->Level, OverflowMap);
+	}
+}
+
+void OverflowTreatment(int32 InPathIndex, FNodeSearchPath& InSearchPath, FOverflowMap& InOverflowMap)
+{
+	FNode* OverflowNode = InSearchPath[InPathIndex].Key;
+	FNode* Parent = InSearchPath[InPathIndex].Value;
+	
+	if(OverflowNode->Children.Num() > MaxNodes)
+	{
+		if(OverflowNode->Level != Root->Level && InOverflowMap.Find(OverflowNode->Level) == InOverflowMap.Num() - 1))
+		{
+			InOverflowMap.Insert(OverflowNode->Level);
+			Reinsert(OverflowNode, InOverflowMap);
+		}
+		else
+		{
+			FNode* NewSplitNode = SplitNode(OverflowNode);
+			if(OverflowNode->Level == Root->Level)
+			{
+				FNode* NewRoot = new FNode();
+				NewRoot->Children.Add(NewSplitNode);
+				NewRoot->Children.Add(Root);
+				NewRoot->CalculateBounds();
+				NewRoot->Level = OverflowNode->Level + 1;
+				Root = NewRoot;
+			}
+			else
+			{
+				Parent->Children.Add(NewSplitNode);
+				Parent->CalculateBounds();
+			}
+			
+			if(InPathIndex - 1 >= 0)
+				OverflowTreatment(InPathIndex - 1, InSearchPath, InOverflowMap);
+		}
+	}
+}
+
+void UnderflowTreatment(int32 InPathIndex, FNodeSearchPath& InSearchPath, FChildReinsertQueue& InNodesToReinsert)
+{
+	FNode* UnderflowNode = InSearchPath[InPathIndex].Key;
+	FNode* Parent = InSearchPath[InPathIndex].Value;
+	
+	if(UnderflowNode->Level == Root->Level)
+	{
+		if(!UnderflowNode->IsLeaf() && UnderflowNode->Children.Num() == 1)
+		{
+			Root = UnderflowNode->GetChild(0);
+			Root->Level = UnderflowNode->Level - 1;
+			
+			delete UnderflowNode;
+			UnderflowNode = nullptr;
+		}
+		
+		Root->CalculateBounds();
+		
+		return;
+	}
+	
+	if(UnderflowNode->Children.Num() < MinNodes)
+	{
+		for(size_t i = 0; i < UnderflowNode->Children.Num(); i++)
+			InNodesToReinsert.Add(MakePair(UnderflowNode->Children[i], UnderflowNode->Level));
+		
+		UnderflowNode->Children.Empty();
+		
+		for(size_t i = 0; i < Parent->Children.Num(); i++)
+		{
+			if(Parent->Children[i] == UnderflowNode)
+			{
+				delete Parent->Children[i];
+				Parent->Children.RemoveAt(i);
+				
+				Parent->CalculateBounds();
+				break;
+			}
+		}
+	}
+	
+	UnderflowTreatment(InPathIndex - 1, InSearchPath, InNodesToReinsert);
+}
+
+void UnderflowTreatment(int32 InPathIndex, FNodeSearchPath& InSearchPath)
+{
+	FChildReinsertQueue NodesToReinsert;
+	UnderflowTreatment(InPathIndex, InSearchPath, NodesToReinsert);
+	
+	for(size_t i = 0; i < NodesToReinsert.Num(); i++)
+	{
+		FOverflowMap OverflowMap;
+		Insert(NodesToReinsert[i].Key, NodesToReinsert[i].Value, OverflowMap);
+	}
+}
+
+void Insert(FRTreeChild* InEntry, int32 InDesiredLevel, FOverflowMap& InOverflowMap)
+{
+	FNodeSearchPath SearchPath = FindSuitableNode(InEntry->Bounds);
+	
+	int32 PathIndex = SearchPath.Num() - 1;
+	while(SearchPath[PathIndex].Key->Level < InDesiredLevel)
+		--PathIndex;
+	
+	FNode* SuitableNode = SearchPath[PathIndex].Key;
+	FNode* Parent = SearchPath[PathIndex.Value;
+	
+	SuitableNode->Children.Add(InEntry);
+	SuitableNode->CalculateBounds();
+	
+	if(SuitableNode->Children.Num() > MaxNodes)
+		OverflowTreatment(PathIndex, SearchPath, InOverflowMap);
+	
+	while(PathIndex <= 0)
+	{
+		FNode* NodeInPath = SearchPath[PathIndex].Key;
+		NodeInPath->CalculateBounds();
+		
+		--PathIndex;
+	}
+}
+
+bool Remove(IdentifierType InId, const FBox& InEntryBounds, FNodeSearchPath& InOutSearchPath)
+{
+	FNode* Node = InOutSearchPath[0];
+	for(size_t i = 0; i < Node->Childre.Num(); i++)
+	{
+		FRTreeChild* Child = Node->Children[i];
+		if(InEntryBounds.Intersects(Child->Bounds))
+		{
+			if(Node->IsLeaf())
+			{
+				if(InId == static_cast<FEntry*>->Id)
+				{
+					Node->Children.RemoveAt(i);
+					SpareIds.Add(InId);
+					
+					delete Child;
+					Child = nullptr;
+					
+					Node->CalculateBounds();
+					
+					UnderflowTreatment(InOutSearchPath.Num() - 1, InOutSearchPath);
+					
+					return true;
+				}
+				else
+				{
+					InOutSearchPath.Add(MakePair(static_cast<FNode*>(Child), Node));
+					bool bRecurseReturn = Remove(InId, InEntryBounds, InOutSearchPath);
+					
+					if(bRecurseReturn)
+						return true;
+				}
+			}
+		}
+	}
+	
+	return false;
+}
+
+ElementType* Get(FNode* InNode, IdentifierType InId, const FBox& InQueryBounds)
+{
+	for(auto i = 0; i < InNode->Children.Num(); i++)
+	{
+		auto Child = InNode->Children[i];
+		if(InQueryBounds.Intersects(Child->Bounds))
+		{
+			if(InNode->IsLeaf())
+			{
+				auto Entry = static_cast<FEntry*>(Child);
+				if(InId == Entry->Id)
+					return &Entry->Data;
+			}
+			else
+				return Get(static_cast<FNode*>(Child), InId, InQueryBounds);
+		}
+	}
+	
+	return nullptr;
+}
+
+void Query(const FNode& InNodeToQuery, const FBox& InQueryBounds, FQueryResult& OutQueryResult)
+{
+	for(auto i = 0; i < InNodeToQuery.Num(); i++)
+	{
+		auto Child = InNodeToQuery->Children[i];
+		if(Child->Bounds.Intersects(InQueryBounds))
+		{
+			if(InNodeToQuery.IsLeaf())
+				OutQueryResult.Add(InNodeToQuery.GetEntry(i));
+			else
+				Query(*InNodeToQuery.GetChild(i), InQueryBounds, OutQueryResult);
+		}
+	}
+}
+
+public:
+	IdentifierType Insert(ElementType InNewEntry, const FBox& InEntryBounds)
+	{
+		FOverflowMap OverflowMap;
+		
+		FEntry* Entry = new FEntry(InNewEntry);
+		Entry->Bounds = InEntryBounds;
+		
+		if(!SpareIds.Empty())
+		{
+			Entry->Id = SpareIds.Last();
+			SpareIds.pop_back();
+		}
+		else
+			Entry->Id = IdIndex++;
+		
+		Insert(Entry, 0, OverflowMap);
+		return Entry->Id;
+	}
+	
+	bool Remove(IdentifierType InId, const FBox& InEntryBounds)
+	{
+		FNodeSerachPath SearchPath;
+		SearchPath.Add(MakePair(Root, nullptr));
+		bool bRemoved = Remove(InId, InEntryBounds, SearchPath);
+		return bRemoved;
+	}
+	
+	ElementType* Get(IdentifierType InId, const FBox& InQueryBounds)
+	{
+		return Get(Root, InId, InQueryBounds);
+	}
+	
+	FQueryResult Query(const FBox& InQueryBounds)
+	{
+		FQueryResult Result;
+		Query(*Root, InQueryBounds, Result);
+		return Result;
+	}
+	
+	FRTree()
+		: Root(),
+		IdIndex(0)
+	{
+		Root = new FNode();
+	}
+	
+	~FRTree()
+	{
+		delete Root;
+		Root = nullptr;
+	}
