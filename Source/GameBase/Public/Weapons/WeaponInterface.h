@@ -11,6 +11,7 @@ class UWeaponInterface
 	GENERATED_BODY()
 };
 
+// TODO: Interface for weapons
 class GAMEBASE_API IWeaponInterface
 {
 	GENERATED_BODY()

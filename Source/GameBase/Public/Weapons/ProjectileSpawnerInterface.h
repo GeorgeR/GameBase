@@ -14,11 +14,16 @@ class UProjectileSpawnerInterface
 	GENERATED_BODY()
 };
 
+/* Generic projectile spawner, can fire and returns an event when hit. */
+/* TODO: Need a way of associating a hit with a fire call. */
 class GAMEBASE_API IProjectileSpawnerInterface
 {
 	GENERATED_BODY()
 
 public:
-	virtual void Fire(const FProjectileParams& Params) = 0;
-	virtual FOnHit& GetOnHit() = 0;
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "GameBase|Weapons")
+	void Fire(const FProjectileParams& Params);
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "GameBase|Weapons")
+	FOnHit GetOnHit();
 };

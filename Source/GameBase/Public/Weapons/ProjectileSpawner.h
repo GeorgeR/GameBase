@@ -5,6 +5,7 @@
 
 #include "ProjectileSpawner.generated.h"
 
+/* Default implementation of a projectile spawner. */
 UCLASS()
 class UProjectileSpawner
 	: public UObject,
@@ -16,15 +17,18 @@ public:
 	UPROPERTY()
 	TSubclassOf<AProjectile> ProjectileClass;
 
-	virtual void Fire(const FProjectileParams& Params) override;
-	virtual FOnHit& GetOnHit() override { return OnHit; }
+	virtual void Fire_Implementation(const FProjectileParams& Params) override;
+	virtual FOnHit GetOnHit_Implementation() override { return OnHitEvent; }
 
 protected:
 	template <typename T>
 	T* SpawnProjectile(FVector InStart, FVector InDirection, float InSpeed);
 
 private:
-	FOnHit OnHit;
+	FOnHit OnHitEvent;
+
+	UFUNCTION()
+	void OnHit(FDamageHit& InHit);
 };
 
 template <typename T>

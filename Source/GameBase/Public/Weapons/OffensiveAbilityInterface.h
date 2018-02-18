@@ -12,14 +12,17 @@ class UOffensiveAbilityInterface
 	GENERATED_BODY()
 };
 
+/* Paired with VulnerabilityInterface, useful for AI */
 class GAMEBASE_API IOffensiveAbilityInterface
 {
 	GENERATED_BODY()
 
 public:
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "GameBase")
+	/* Returns a bitflag enum with offensive capabilities. */
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "GameBase|Weapons")
 	uint8 GetOffensiveAbilities();
 
+	/* Checks if this object has offensive capabilites that match a targets vulnerabilities, and returns that set of offensive abilities (it might not be all of them). */
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "GameBase")
-	bool Matches(const TScriptInterface<IVulnerabilityInterface>& InVulnerability);
+	bool MatchesVulnerability(const TScriptInterface<IVulnerabilityInterface>& InVulnerability, uint8 OutOffensiveAbilities);
 };

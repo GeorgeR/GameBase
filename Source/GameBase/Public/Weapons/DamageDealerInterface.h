@@ -2,30 +2,28 @@
 
 #include "DamageDealerInterface.generated.h"
 
-UINTERFACE(BlueprintType, Blueprintable, MinimalAPI, meta = (CannotImplementInterfaceInBlueprint))
+UINTERFACE(BlueprintType, Blueprintable, MinimalAPI)
 class UDamageDealerInterface
 	: public UInterface
 {
-	GENERATED_UINTERFACE_BODY()
+	GENERATED_BODY()
 };
 
+/* Interface for an object that can deal damage */
 class GAMEBASE_API IDamageDealerInterface
 {
-	GENERATED_IINTERFACE_BODY()
+	GENERATED_BODY()
 
 public:
-	UFUNCTION(BlueprintCallable, Category = "GameBase|Damage")
-	virtual FName GetName() = 0;
+	/* Returns the name of the dealer, usually the player name. Useful for UI notifications. */
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "GameBase|Damage")
+	FName GetName();
 	
-	UFUNCTION(BlueprintCallable, Category = "GameBase|Damage")
-	virtual int32 GetTeamName() = 0;
+	/* Returns the dealers team, if any (might return red, blue, or guild). */
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "GameBase|Damage")
+	FName GetTeam();
 
-	template <typename TTeamName>
-	TTeamName GetTeamNameAs();
+	/* Returns the associated controller. */
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "GameBase|Damage")
+	AController* GetController();
 };
-
-template <typename TTeamName>
-TTeamName IDamageDealerInterface::GetTeamNameAs()
-{
-	return static_cast<TTeamName>(GetTeamName());
-}

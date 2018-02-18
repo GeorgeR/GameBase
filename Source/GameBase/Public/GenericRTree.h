@@ -1,3 +1,5 @@
+// NOTE: Incomplete, don't use
+
 #pragma once
 
 #include "CoreMinimal.h"

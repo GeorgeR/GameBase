@@ -11,6 +11,7 @@ enum class EMapOrder : uint8
 	MO_Random = 1		UMETA(DisplayName = "Random")
 };
 
+/* A convenient object for specifying a map queue. */
 USTRUCT(BlueprintType)
 struct GAMEBASE_API FMapList
 {

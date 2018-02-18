@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+
 #include "TreeNodeInterface.generated.h"
 
 UINTERFACE(MinimalAPI, meta = (CannotImplementInterfaceInBlueprint))
@@ -10,6 +11,7 @@ class UTreeNodeInterface
 	GENERATED_BODY()
 };
 
+/* Generic tree strucuture node. */
 class GAMEBASE_API ITreeNodeInterface
 {
 	GENERATED_BODY()

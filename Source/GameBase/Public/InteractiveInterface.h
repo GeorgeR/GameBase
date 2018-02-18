@@ -17,8 +17,8 @@ class GAMEBASE_API IInteractiveInterface
 
 public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "GameBase")
-	bool CanInteract(APlayerState* InPlayer);
+	bool CanInteract(AActor* InUser);
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "GameBase")
-	void Interact(APlayerState* InPlayer);
+	void Interact(AActor* InUser);
 };

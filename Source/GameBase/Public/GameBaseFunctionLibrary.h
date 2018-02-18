@@ -70,12 +70,14 @@ public:
 	template <typename TComponent>
 	static bool ForComponent(AActor* InActor, TFunction<void(TComponent*)> InFunc);
 
+#pragma region Silly functions that will probably be moved
 	template <typename T>
 	TArray<T> Splice(TArray<T>& InSource, int32 InStart, int32 InEnd);
 
 	FBox Encompass(const FBox& InSource, const FVector& InPoint);
 
 	FBox Encompass(const FBox& InSource, const FBox& InOther);
+#pragma endregion Silly functions that will probably be moved
 };
 
 template <typename T>

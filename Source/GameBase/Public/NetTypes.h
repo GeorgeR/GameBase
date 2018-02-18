@@ -2,6 +2,7 @@
 
 #include "NetTypes.generated.h"
 
+/* Stores a float in the range of 0.0-1.0 as a byte (0-255). */
 USTRUCT(BlueprintType)
 struct GAMEBASE_API FSingle_Normalized
 {
@@ -22,6 +23,7 @@ public:
 	float GetValue() const;
 };
 
+/* Stores a float in the range -1.0-1.0 as a signed byte (-127-127) */
 USTRUCT(BlueprintType)
 struct GAMEBASE_API FSingle_SignedNormalized
 {
@@ -42,6 +44,7 @@ public:
 	float GetValue() const;
 };
 
+/* Stores a Quaternion as a quantized normalized vector, and a normalized float */
 USTRUCT(BlueprintType)
 struct GAMEBASE_API FQuat_NetQuantize
 {

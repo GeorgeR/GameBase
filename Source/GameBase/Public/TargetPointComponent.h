@@ -5,6 +5,7 @@
 
 #include "TargetPointComponent.generated.h"
 
+/* A user or procedurally placed component to help AI targeting. */
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class GAMEBASE_API UTargetPointComponent 
 	: public USceneComponent

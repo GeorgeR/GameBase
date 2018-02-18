@@ -1,7 +1,7 @@
 #include "BulletProjectileSpawner.h"
 #include "DrawDebugHelpers.h"
 
-void UBulletProjectileSpawner::Fire(const FProjectileParams& Params)
+void UBulletProjectileSpawner::Fire_Implementation(const FProjectileParams& Params)
 {
 	FCollisionQueryParams CollisionParams;
 	CollisionParams.AddIgnoredActors(Params.IgnoredActors);
@@ -16,8 +16,8 @@ void UBulletProjectileSpawner::Fire(const FProjectileParams& Params)
 
 		if (GetOnHit().IsBound())
 		{
-			FDamageHit Hit(Params.DamageInfo, Params.Direction, HitResult);
-			GetOnHit().Broadcast(Hit);
+			/*FDamageHit Hit(Params.DamageInfo, Params.Direction, HitResult);
+			GetOnHit().Execute(Hit);*/
 		}
 	}
 }

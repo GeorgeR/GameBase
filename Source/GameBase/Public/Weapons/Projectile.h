@@ -6,10 +6,44 @@
 
 #include "Projectile.generated.h"
 
-struct FDamageHit;
+class IDamageDealerInterface;
 
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnHit, FDamageHit&);
+/* Based on Tom Looman's Survival Game TakeHitInfo. */
+USTRUCT(BlueprintType)
+struct GAMEBASE_API FDamageHit
+{
+	GENERATED_BODY()
 
+private:
+	UPROPERTY()
+	FDamageEvent DamageEvent;
+
+	UPROPERTY()
+	FPointDamageEvent PointDamageEvent;
+
+	UPROPERTY()
+	FRadialDamageEvent RadialDamageEvent;
+
+public:
+	UPROPERTY()
+	TScriptInterface<IDamageDealerInterface> Dealer;
+
+	UPROPERTY()
+	float Damage;
+
+	UPROPERTY()
+	uint8 DamageEventClassID;
+	
+	FDamageHit()
+		: Dealer(nullptr),
+		Damage(0.0f) { }
+	
+	FDamageEvent& GetDamageEvent();
+};
+
+DECLARE_DYNAMIC_DELEGATE_OneParam(FOnHit, FDamageHit&, InHit);
+
+/* Parameters needed for a projectile. */
 USTRUCT(BlueprintType)
 struct GAMEBASE_API FProjectileParams
 {
@@ -35,34 +69,7 @@ public:
 	FProjectileParams(FDamageInfo& InDamageInfo, FVector InStart, FVector InDirection);
 };
 
-USTRUCT(BlueprintType)
-struct GAMEBASE_API FDamageHit
-{
-	GENERATED_BODY()
-
-public:
-	UPROPERTY()
-	FDamageInfo DamageInfo;
-
-	UPROPERTY()
-	AActor* Actor;
-
-	UPROPERTY()
-	UPrimitiveComponent* Component;
-
-	UPROPERTY()
-	FVector Location;
-
-	UPROPERTY()
-	FVector Direction;
-
-	UPROPERTY()
-	FVector Normal;
-
-	FDamageHit() { }
-	FDamageHit(const FDamageInfo& InDamageInfo, FVector InDirection, const FHitResult& InHitResult);
-};
-
+/* An actual projectile actor, similar to UE4's own implementation. */
 UCLASS(Abstract)
 class GAMEBASE_API AProjectile 
 	: public AActor
@@ -92,8 +99,7 @@ public:
 
 	void SetHomingTarget(AActor* InActor);
 
-	UFUNCTION()
-	void OnComponentHit(UPrimitiveComponent* InHitComponent, AActor* InOtherActor, UPrimitiveComponent* InOtherComponent, FVector InNormalImpulse, const FHitResult& OutHit);
+	void OnComponentHit_Implementation(UPrimitiveComponent* InHitComponent, AActor* InOtherActor, UPrimitiveComponent* InOtherComponent, FVector InNormalImpulse, const FHitResult& OutHit);
 
 	FOnHit& GetOnHit() { return OnHit; }
 

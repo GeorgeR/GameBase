@@ -2,8 +2,9 @@
 
 #include "WeaponInfo.generated.h"
 
-class AWeaponActor;
+class UWeaponInterface;
 
+/* Generic weapon info, useful when you need UI info and not the actual actor. */
 USTRUCT(BlueprintType)
 struct FWeaponInfo
 {
@@ -11,8 +12,8 @@ struct FWeaponInfo
 
 public:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere)
-	UClass* Class;
-
+	TSubclassOf<UWeaponInterface> WeaponClass;
+	
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
 	FName Name;
 

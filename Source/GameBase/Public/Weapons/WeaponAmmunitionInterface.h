@@ -11,12 +11,18 @@ class UWeaponAmmunitionInterface
 	GENERATED_BODY()
 };
 
+/* Stores information for weapon ammunition and damage types. */
 class GAMEBASE_API IWeaponAmmunitionInterface
 {
 	GENERATED_BODY()
 
 public:
-	virtual uint8 GetAmmoType() = 0;
-	virtual uint8 GetDamageType() = 0;
-	virtual const float GetSpeed() const = 0;
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "GameBase|Weapons")
+	uint8 GetAmmoType();
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "GameBase|Weapons")
+	uint8 GetDamageType();
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "GameBase|Weapons")
+	float GetSpeed();
 };

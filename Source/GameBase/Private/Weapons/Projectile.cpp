@@ -8,14 +8,9 @@ FProjectileParams::FProjectileParams(FDamageInfo& InDamageInfo, FVector InStart,
 	Start(InStart),
 	Direction(InDirection) { }
 
-FDamageHit::FDamageHit(const FDamageInfo& InDamageInfo, FVector InDirection, const FHitResult& InHitResult)
-	: DamageInfo(InDamageInfo)
+FDamageEvent& FDamageHit::GetDamageEvent()
 {
-	Actor = InHitResult.GetActor();
-	Component = InHitResult.GetComponent();
-	Location = InHitResult.Location;
-	Direction = InDirection;
-	Normal = InHitResult.Normal;
+	return DamageEvent;
 }
 
 AProjectile::AProjectile()
@@ -23,7 +18,8 @@ AProjectile::AProjectile()
 	Sphere = CreateDefaultSubobject<USphereComponent>(TEXT("Sphere"));
 	Sphere->InitSphereRadius(5.0f);
 	Sphere->BodyInstance.SetCollisionProfileName(TEXT("Projectile"));
-	Sphere->OnComponentHit.AddDynamic(this, &AProjectile::OnComponentHit);
+	// TODO
+	//Sphere->OnComponentHit.AddDynamic(this, &AProjectile::OnComponentHit);
 	Sphere->SetWalkableSlopeOverride(FWalkableSlopeOverride(WalkableSlope_Unwalkable, 0.0f));
 	Sphere->CanCharacterStepUpOn = ECanBeCharacterBase::ECB_No;
 
@@ -48,8 +44,8 @@ void AProjectile::SetHomingTarget(AActor* InActor)
 	Movement->HomingTargetComponent = InActor->GetRootComponent();
 }
 
-void AProjectile::OnComponentHit(UPrimitiveComponent* InHitComponent, AActor* InOtherActor, UPrimitiveComponent* InOtherComponent, FVector InNormalImpulse, const FHitResult& OutHit)
+void AProjectile::OnComponentHit_Implementation(UPrimitiveComponent* InHitComponent, AActor* InOtherActor, UPrimitiveComponent* InOtherComponent, FVector InNormalImpulse, const FHitResult& OutHit)
 {
-	FDamageHit Hit(DamageInfo, InNormalImpulse, OutHit);
-	GetOnHit().Broadcast(Hit);
+	//FDamageHit Hit(DamageInfo, InNormalImpulse, OutHit);
+	//GetOnHit().Execute(Hit);
 }

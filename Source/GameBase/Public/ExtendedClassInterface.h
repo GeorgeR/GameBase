@@ -11,6 +11,7 @@ class UExtendedClassInterface
 	GENERATED_BODY()
 };
 
+/* If you have user implementations of a class, use this to choose which takes precedence by order. */
 class GAMEBASE_API IExtendedClassInterface
 {
 	GENERATED_BODY()

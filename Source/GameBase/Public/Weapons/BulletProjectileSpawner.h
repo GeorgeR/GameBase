@@ -6,6 +6,7 @@
 
 #include "BulletProjectileSpawner.generated.h"
 
+/* A bullet spawner rather than a projectile. Does a linecast rather than spawning a physical projectile. */
 UCLASS(BlueprintType)
 class GAMEBASE_API UBulletProjectileSpawner
 	: public UObject,
@@ -14,8 +15,8 @@ class GAMEBASE_API UBulletProjectileSpawner
 	GENERATED_BODY()
 
 public:
-	virtual void Fire(const FProjectileParams& Params) override;
-	virtual FOnHit& GetOnHit() override { return OnHit; }
+	virtual void Fire_Implementation(const FProjectileParams& Params) override;
+	virtual FOnHit GetOnHit_Implementation() override { return OnHit; }
 
 private:
 	FOnHit OnHit;
