@@ -18,4 +18,5 @@ class GAMEBASE_API IHasDisplayNameInterface
 public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "GameBase")
 	FName GetDisplayName();
+	virtual FName GetDisplayName_Implementation() { return FName(); }
 };

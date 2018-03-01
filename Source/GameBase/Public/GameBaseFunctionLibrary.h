@@ -8,6 +8,7 @@
 #define HasFlag(Value, Flag) (((Value & static_cast<uint8>(Flag))) == static_cast<uint8>(Flag))
 #define AddFlag(Value, Flag) Value |= static_cast<uint8>(Flag)
 #define RemoveFlag(Value, Flag) Value &= ~static_cast<uint8>(Flag)
+#define HasntFlag(Value, Flag) (((Value & static_cast<uint8>(Flag))) != static_cast<uint8>(Flag))
 
 UCLASS()
 class GAMEBASE_API UGameBaseFunctionLibrary 
