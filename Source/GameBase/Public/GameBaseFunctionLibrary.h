@@ -2,6 +2,8 @@
 
 #include "CoreMinimal.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
+#include "Kismet/GameplayStatics.h"
+#include "Engine/World.h"
 
 #include "GameBaseFunctionLibrary.generated.h"
 
@@ -9,6 +11,7 @@
 #define HasntFlag(Value, Flag) (((Value & static_cast<uint8>(Flag))) != static_cast<uint8>(Flag))
 #define AddFlag(Value, Flag) Value |= static_cast<uint8>(Flag)
 #define RemoveFlag(Value, Flag) Value &= ~static_cast<uint8>(Flag)
+#define HasntFlag(Value, Flag) (((Value & static_cast<uint8>(Flag))) != static_cast<uint8>(Flag))
 
 UCLASS()
 class GAMEBASE_API UGameBaseFunctionLibrary 
@@ -75,9 +78,9 @@ public:
 	template <typename T>
 	TArray<T> Splice(TArray<T>& InSource, int32 InStart, int32 InEnd);
 
-	FBox Encompass(const FBox& InSource, const FVector& InPoint);
+	FBox Encompass(const FBox& InSource, const FVector& InPoint) const;
 
-	FBox Encompass(const FBox& InSource, const FBox& InOther);
+	FBox Encompass(const FBox& InSource, const FBox& InOther) const;
 #pragma endregion Silly functions that will probably be moved
 };
 
@@ -123,7 +126,7 @@ T* UGameBaseFunctionLibrary::GetPlayerStateAs(UObject* InWorldContextObject)
 	check(InWorldContextObject);
 	check(InWorldContextObject->GetWorld());
 
-	APlayerController* PlayerController = GetPlayerControllerAs<APlayerController>(InWorldContextObject);
+	const auto PlayerController = GetPlayerControllerAs<APlayerController>(InWorldContextObject);
 	if (PlayerController == nullptr)
 		return nullptr;
 
@@ -172,8 +175,7 @@ TComponent* UGameBaseFunctionLibrary::GetComponent(const AActor* InActor)
 }
 
 template <typename TComponent>
-static TArray<TComponent*>
-UGameBaseFunctionLibrary::GetComponents(const AActor* InActor)
+TArray<TComponent*> UGameBaseFunctionLibrary::GetComponents(const AActor* InActor)
 {
 	check(InActor);
 
@@ -188,18 +190,18 @@ UGameBaseFunctionLibrary::GetComponents(const AActor* InActor)
 template <typename T>
 FName UGameBaseFunctionLibrary::GetEnumName(const FName InEnumName, const T InValue)
 {
-	UEnum* Enum = FindObject<UEnum>(ANY_PACKAGE, *InEnumName.ToString(), true);
+	const auto Enum = FindObject<UEnum>(ANY_PACKAGE, *InEnumName.ToString(), true);
 	check(Enum);
 	if (Enum == nullptr)
 		return TEXT("");
 
-	FString EnumName = Enum->GetFName().ToString();
+	auto EnumName = Enum->GetFName().ToString();
 	EnumName.RemoveFromStart(TEXT("E"), ESearchCase::CaseSensitive);
-	FString UppercaseChars = GetUppercaseChars(EnumName);
+	const auto UppercaseChars = GetUppercaseChars(EnumName);
 
-	FString ValueName = Enum->GetNameStringByIndex(static_cast<uint8>(InValue));
+	auto ValueName = Enum->GetNameStringByIndex(static_cast<uint8>(InValue));
 	ValueName.RemoveFromStart(UppercaseChars + TEXT("_"));
-	FName Result = *ValueName;
+	const FName Result = *ValueName;
 
 	return Result;
 }

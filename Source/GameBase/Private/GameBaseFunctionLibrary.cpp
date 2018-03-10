@@ -6,10 +6,10 @@
 
 FVector2D UGameBaseFunctionLibrary::GetMousePosition(UObject* InWorldContextObject)
 {
-	APlayerController* PlayerController = GetPlayerControllerAs<APlayerController>(InWorldContextObject);
-	
-	float X = 0.0f;
-	float Y = 0.0f;
+	const auto PlayerController = GetPlayerControllerAs<APlayerController>(InWorldContextObject);
+
+	auto X = 0.0f;
+	auto Y = 0.0f;
 	PlayerController->GetMousePosition(X, Y);
 
 	return FVector2D(X, Y);
@@ -17,13 +17,13 @@ FVector2D UGameBaseFunctionLibrary::GetMousePosition(UObject* InWorldContextObje
 
 bool UGameBaseFunctionLibrary::GetMouseRay(UObject* InWorldContextObject, FVector& OutStart, FVector& OutDirection)
 {
-	FVector2D MousePosition = GetMousePosition(InWorldContextObject);
+	const auto MousePosition = GetMousePosition(InWorldContextObject);
 	return UGameplayStatics::DeprojectScreenToWorld(GetPlayerControllerAs<APlayerController>(InWorldContextObject), MousePosition, OutStart, OutDirection);
 }
 
 void UGameBaseFunctionLibrary::GetCenterScreenRay(UObject* InWorldContextObject, FVector& OutStart, FVector& OutDirection)
 {
-	APlayerController* PlayerController = GetPlayerControllerAs<APlayerController>(InWorldContextObject);
+	const auto PlayerController = GetPlayerControllerAs<APlayerController>(InWorldContextObject);
 
 	FVector Start;
 	FRotator Rotator;
@@ -39,12 +39,12 @@ bool UGameBaseFunctionLibrary::GetScreenspaceBounds(APlayerController* InPlayerC
 
 	int32 Width, Height;
 	InPlayerController->GetViewportSize(Width, Height);
-	FVector2D Size(Width, Height);
+	const FVector2D Size(Width, Height);
 
 	TArray<FVector> Points;
 	GetBoundsPoints(InActor, Points);
-	
-	bool bPartiallyOnScreen = false;
+
+	auto bPartiallyOnScreen = false;
 	for (auto i = 0; i < Points.Num(); i++)
 	{
 		FVector2D Point2D;
@@ -60,13 +60,13 @@ bool UGameBaseFunctionLibrary::GetScreenspaceBounds(APlayerController* InPlayerC
 
 void UGameBaseFunctionLibrary::FitViewToBounds(const FBox& InBounds, float& InFOV, FTransform& InOutTransform)
 {
-	FVector Center = InBounds.GetCenter();
-	float Radius = InBounds.GetExtent().Size();
+	const auto Center = InBounds.GetCenter();
+	const auto Radius = InBounds.GetExtent().Size();
 
-	float FOV = InFOV;
-	float HalfFOV = FMath::DegreesToRadians(FOV / 2.0f);
-	float DistanceFromSphere = Radius / FMath::Tan(HalfFOV);
-	FVector CameraOffset = InOutTransform.GetRotation().Vector() * -DistanceFromSphere;
+	const auto FOV = InFOV;
+	const auto HalfFOV = FMath::DegreesToRadians(FOV / 2.0f);
+	const auto DistanceFromSphere = Radius / FMath::Tan(HalfFOV);
+	const auto CameraOffset = InOutTransform.GetRotation().Vector() * -DistanceFromSphere;
 	InOutTransform.SetLocation(Center + CameraOffset);
 }
 
@@ -78,8 +78,8 @@ FString UGameBaseFunctionLibrary::GetUppercaseChars(FString InString)
 	FString Result;
 	while (Matcher.FindNext())
 	{
-		int32 Start = Matcher.GetMatchBeginning();
-		int32 Count = Matcher.GetMatchEnding() - Start;
+		const auto Start = Matcher.GetMatchBeginning();
+		const auto Count = Matcher.GetMatchEnding() - Start;
 
 		Result += InString.Mid(Matcher.GetMatchBeginning(), Count);
 	}
@@ -89,9 +89,9 @@ FString UGameBaseFunctionLibrary::GetUppercaseChars(FString InString)
 
 void UGameBaseFunctionLibrary::GetBoundsPoints(AActor* InActor, TArray<FVector>& OutVertices)
 {
-	FBox Bounds = InActor->GetComponentsBoundingBox();
-	FVector Min = Bounds.Min;
-	FVector Max = Bounds.Max;
+	const auto Bounds = InActor->GetComponentsBoundingBox();
+	const auto Min = Bounds.Min;
+	const auto Max = Bounds.Max;
 
 	OutVertices.Empty();
 	OutVertices = {
@@ -106,10 +106,10 @@ void UGameBaseFunctionLibrary::GetBoundsPoints(AActor* InActor, TArray<FVector>&
 	};
 }
 
-FBox UGameBaseFunctionLibrary::Encompass(const FBox& InSource, const FVector& InPoint)
+FBox UGameBaseFunctionLibrary::Encompass(const FBox& InSource, const FVector& InPoint) const
 {
-	FVector Min = InSource.Min;
-	FVector Max = InSource.Max;
+	auto Min = InSource.Min;
+	auto Max = InSource.Max;
 
 	Min.X = FMath::Min(Min.X, InPoint.X);
 	Min.Y = FMath::Min(Min.Y, InPoint.Y);
@@ -122,10 +122,10 @@ FBox UGameBaseFunctionLibrary::Encompass(const FBox& InSource, const FVector& In
 	return FBox(Min, Max);
 }
 
-FBox UGameBaseFunctionLibrary::Encompass(const FBox& InSource, const FBox& InOther)
+FBox UGameBaseFunctionLibrary::Encompass(const FBox& InSource, const FBox& InOther) const
 {
-	FVector Min = InSource.Min;
-	FVector Max = InSource.Max;
+	auto Min = InSource.Min;
+	auto Max = InSource.Max;
 
 	Min.X = FMath::Min(Min.X, InOther.Min.X);
 	Min.Y = FMath::Min(Min.Y, InOther.Min.Y);

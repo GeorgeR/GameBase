@@ -1,10 +1,11 @@
 #include "MapList.h"
 
 FMapList::FMapList()
+	: CurrentMapIndex(0)
 {
 	Order = EMapOrder::MO_InOrder;
 
-	MapNames = { TEXT("/Game/Empires/Maps/TestMap") };
+	MapNames = {TEXT("/Game/Empires/Maps/TestMap")};
 }
 
 FName FMapList::GetNextMap()
