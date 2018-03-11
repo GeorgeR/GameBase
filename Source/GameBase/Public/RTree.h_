@@ -46,10 +46,10 @@ private:
 			Children.Init(MinNodes);
 		}
 		
-		ElementType GetEntry(uint32 InIndex) { return static_cast<FEntry*>(Children[InIndex])->Data; };
-		const ElementType GetEntry(uint32 InIndex) const { return static_cast<FEntry*>(Children[InIndex])->Data; };
-		FNode* GetChild(uint32 InIndex) { return static_cast<FNode*>(Children[InIndex]); };
-		const FNode* GetChild(uint32 InIndex) const { return static_cast<FNode*>(Children[InIndex]); }
+		ElementType GetEntry(uint32 InIndex) { return StaticCast<FEntry*>(Children[InIndex])->Data; };
+		const ElementType GetEntry(uint32 InIndex) const { return StaticCast<FEntry*>(Children[InIndex])->Data; };
+		FNode* GetChild(uint32 InIndex) { return StaticCast<FNode*>(Children[InIndex]); };
+		const FNode* GetChild(uint32 InIndex) const { return StaticCast<FNode*>(Children[InIndex]); }
 	};
 	
 	typedef TArray<TPair<FNode*, FNode*>> NodeSearchPath;
@@ -449,7 +449,7 @@ bool Remove(IdentifierType InId, const FBox& InEntryBounds, FNodeSearchPath& InO
 		{
 			if(Node->IsLeaf())
 			{
-				if(InId == static_cast<FEntry*>->Id)
+				if(InId == StaticCast<FEntry*>->Id)
 				{
 					Node->Children.RemoveAt(i);
 					SpareIds.Add(InId);
@@ -465,7 +465,7 @@ bool Remove(IdentifierType InId, const FBox& InEntryBounds, FNodeSearchPath& InO
 				}
 				else
 				{
-					InOutSearchPath.Add(MakePair(static_cast<FNode*>(Child), Node));
+					InOutSearchPath.Add(MakePair(StaticCast<FNode*>(Child), Node));
 					bool bRecurseReturn = Remove(InId, InEntryBounds, InOutSearchPath);
 					
 					if(bRecurseReturn)
@@ -487,12 +487,12 @@ ElementType* Get(FNode* InNode, IdentifierType InId, const FBox& InQueryBounds)
 		{
 			if(InNode->IsLeaf())
 			{
-				auto Entry = static_cast<FEntry*>(Child);
+				auto Entry = StaticCast<FEntry*>(Child);
 				if(InId == Entry->Id)
 					return &Entry->Data;
 			}
 			else
-				return Get(static_cast<FNode*>(Child), InId, InQueryBounds);
+				return Get(StaticCast<FNode*>(Child), InId, InQueryBounds);
 		}
 	}
 	

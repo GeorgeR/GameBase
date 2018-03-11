@@ -7,11 +7,11 @@
 
 #include "GameBaseFunctionLibrary.generated.h"
 
-#define HasFlag(Value, Flag) (((Value & static_cast<uint8>(Flag))) == static_cast<uint8>(Flag))
-#define HasntFlag(Value, Flag) (((Value & static_cast<uint8>(Flag))) != static_cast<uint8>(Flag))
-#define AddFlag(Value, Flag) Value |= static_cast<uint8>(Flag)
-#define RemoveFlag(Value, Flag) Value &= ~static_cast<uint8>(Flag)
-#define HasntFlag(Value, Flag) (((Value & static_cast<uint8>(Flag))) != static_cast<uint8>(Flag))
+#define HasFlag(Value, Flag) (((Value & StaticCast<uint8>(Flag))) == StaticCast<uint8>(Flag))
+#define HasntFlag(Value, Flag) (((Value & StaticCast<uint8>(Flag))) != StaticCast<uint8>(Flag))
+#define AddFlag(Value, Flag) Value |= StaticCast<uint8>(Flag)
+#define RemoveFlag(Value, Flag) Value &= ~StaticCast<uint8>(Flag)
+#define HasntFlag(Value, Flag) (((Value & StaticCast<uint8>(Flag))) != StaticCast<uint8>(Flag))
 
 UCLASS()
 class GAMEBASE_API UGameBaseFunctionLibrary 
@@ -199,7 +199,7 @@ FName UGameBaseFunctionLibrary::GetEnumName(const FName InEnumName, const T InVa
 	EnumName.RemoveFromStart(TEXT("E"), ESearchCase::CaseSensitive);
 	const auto UppercaseChars = GetUppercaseChars(EnumName);
 
-	auto ValueName = Enum->GetNameStringByIndex(static_cast<uint8>(InValue));
+	auto ValueName = Enum->GetNameStringByIndex(StaticCast<uint8>(InValue));
 	ValueName.RemoveFromStart(UppercaseChars + TEXT("_"));
 	const FName Result = *ValueName;
 

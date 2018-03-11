@@ -91,11 +91,11 @@ TAmmunition* FDamageInfo::GetAmmunitionAs()
 template <typename TDamageType>
 void FDamageInfo::SetDamageType(TDamageType InDamageType)
 {
-	DamageType = static_cast<uint8>(InDamageType);
+	DamageType = StaticCast<uint8>(InDamageType);
 }
 
 template <typename TDamageType>
 const TDamageType FDamageInfo::GetDamageType() const
 {
-	return static_cast<TDamageType>(DamageType);
+	return StaticCast<TDamageType>(DamageType);
 }
