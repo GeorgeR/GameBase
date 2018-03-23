@@ -180,7 +180,10 @@ TArray<TComponent*> UGameBaseFunctionLibrary::GetComponents(const AActor* InActo
 	check(InActor);
 
 	TArray<TComponent*> Result;
-	TArray<UActorComponent*> Components;
+	TArray<UActorComponent*> Components = InActor->GetComponentsByClass(TComponent::StaticClass());
+	if (Components.Num() == 0)
+		return Result;
+
 	for (auto Component : Components)
 		Result.Add(Cast<TComponent>(Component));
 
