@@ -4,6 +4,11 @@
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "Kismet/GameplayStatics.h"
 #include "Engine/World.h"
+#include "UObjectIterator.h"
+
+#if WITH_EDITOR
+#include "KismetEditorUtilities.h"
+#endif
 
 #include "GameBaseFunctionLibrary.generated.h"
 
@@ -73,6 +78,9 @@ public:
 
 	template <typename TComponent>
 	static bool ForComponent(AActor* InActor, TFunction<void(TComponent*)> InFunc);
+
+	template <typename TClass>
+	static TArray<TClass*> FindAllInherited(TSubclassOf<TClass> InBaseClass);
 
 #pragma region Silly functions that will probably be moved
 	template <typename T>
@@ -221,6 +229,33 @@ bool UGameBaseFunctionLibrary::ForComponent(AActor* InActor, TFunction<void(TCom
 	InFunc(Component);
 
 	return true;
+}
+
+template <typename TClass>
+TArray<TClass*> UGameBaseFunctionLibrary::FindAllInherited(TSubclassOf<TClass> InBaseClass)
+{
+	TArray<TClass*> Result;
+	for(TObjectIterator<TClass> Iterator; Iterator; ++Iterator)
+	{
+		UClass* Class = *Iterator;
+		if (!Class->IsNative())
+			continue;
+
+		if (Class->HasAnyClassFlags(CLASS_Deprecated | CLASS_NewerVersionExists))
+			continue;
+
+#if WITH_EDITOR
+		if(FKismetEditorUtilities::IsClassABlueprintSkeleton(Class))
+			continue;;
+#endif
+
+		if (!Class->IsChildOf(InBaseClass))
+			continue;
+
+		Result.Add(Class);
+	}
+
+	return Result;
 }
 
 template <typename T>
