@@ -12,12 +12,6 @@
 
 #include "GameBaseFunctionLibrary.generated.h"
 
-#define HasFlag(Value, Flag) (((Value & StaticCast<uint8>(Flag))) == StaticCast<uint8>(Flag))
-#define HasntFlag(Value, Flag) (((Value & StaticCast<uint8>(Flag))) != StaticCast<uint8>(Flag))
-#define AddFlag(Value, Flag) Value |= StaticCast<uint8>(Flag)
-#define RemoveFlag(Value, Flag) Value &= ~StaticCast<uint8>(Flag)
-#define HasntFlag(Value, Flag) (((Value & StaticCast<uint8>(Flag))) != StaticCast<uint8>(Flag))
-
 UCLASS()
 class GAMEBASE_API UGameBaseFunctionLibrary 
 	: public UBlueprintFunctionLibrary
@@ -81,6 +75,18 @@ public:
 
 	template <typename TClass>
 	static TArray<TClass*> FindAllInherited(TSubclassOf<TClass> InBaseClass);
+
+	template <typename TEnum1, typename TEnum2>
+	static bool HasFlag(TEnum1 InValue, TEnum2 InFlag) { return ((InValue & StaticCast<uint8>(InFlag))) == StaticCast<uint8>(InFlag); }
+
+	template <typename TEnum1, typename TEnum2>
+	static bool HasntFlag(TEnum1 InValue, TEnum2 InFlag) { return ((InValue & StaticCast<uint8>(InFlag))) == 0; }
+
+	template <typename TEnum1, typename TEnum2>
+	static void AddFlag(TEnum1 InValue, TEnum2 InFlag) { return InValue |= StaticCast<uint8>(InFlag); }
+
+	template <typename TEnum1, typename TEnum2>
+	static void RemoveFlag(TEnum1 InValue, TEnum2 InFlag) { InValue &= ~StaticCast<uint8>(InFlag); }
 
 #pragma region Silly functions that will probably be moved
 	template <typename T>
