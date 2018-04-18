@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Interface.h"
 
 #include "InteractiveInterface.generated.h"
 
