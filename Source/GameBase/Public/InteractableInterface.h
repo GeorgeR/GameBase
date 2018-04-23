@@ -3,23 +3,23 @@
 #include "CoreMinimal.h"
 #include "Interface.h"
 
-#include "InteractiveInterface.generated.h"
+#include "InteractableInterface.generated.h"
 
 UINTERFACE(MinimalAPI)
-class UInteractiveInterface 
+class UInteractableInterface 
 	: public UInterface
 {
 	GENERATED_BODY()
 };
 
-class GAMEBASE_API IInteractiveInterface
+class GAMEBASE_API IInteractableInterface
 {
 	GENERATED_BODY()
 
 public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "GameBase")
-	bool CanInteract(AActor* InUser);
+	bool CanInteract(const TScriptInterface<class IInteractorInterface>& InInteractor);
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "GameBase")
-	void Interact(AActor* InUser);
+	void Interact(const TScriptInterface<class IInteractorInterface>& InInteractor);
 };

@@ -1,19 +1,19 @@
 using UnrealBuildTool;
 
-public class GameBase : ModuleRules
+public class GameBaseEditor : ModuleRules
 {
-	public GameBase(ReadOnlyTargetRules Target) : base(Target)
+	public GameBaseEditor(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
 		
 		PublicIncludePaths.AddRange(
 			new string[] {
-				"GameBase/Public"
+				"GameBaseEditor/Public"
 			});
 
 		PrivateIncludePaths.AddRange(
 			new string[] {
-				"GameBase/Private",
+				"GameBaseEditor/Private",
 			});
 
 		PublicDependencyModuleNames.AddRange(
@@ -25,18 +25,19 @@ public class GameBase : ModuleRules
 		PrivateDependencyModuleNames.AddRange(
 			new string[]
 			{
-				"CoreUObject",
+                "AssetRegistry",
+			    "ContentBrowser",
+                "CoreUObject",
 				"Engine",
+                "MaterialEditor",
 				"Slate",
 				"SlateCore",
+				"UnrealEd"
 			});
 
 		DynamicallyLoadedModuleNames.AddRange(
 			new string[]
 			{
 			});
-
-	    if (Target.bBuildEditor == true)
-	        PrivateDependencyModuleNames.AddRange(new string[] { "UnrealEd", "ContentBrowser" });
     }
 }

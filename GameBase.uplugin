@@ -18,6 +18,11 @@
 			"Name": "GameBase",
 			"Type": "Developer",
 			"LoadingPhase": "Default"
+		},
+		{
+			"Name": "GameBaseEditor",
+			"Type": "Editor",
+			"LoadingPhase": "Default"
 		}
 	]
 }

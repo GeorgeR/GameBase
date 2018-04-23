@@ -3,6 +3,7 @@
 #include "GameFramework/PlayerController.h"
 #include "Kismet/GameplayStatics.h"
 #include "Regex.h"
+#include "EngineUtils.h"
 
 FVector2D UGameBaseFunctionLibrary::GetMousePosition(UObject* InWorldContextObject)
 {
@@ -104,6 +105,30 @@ void UGameBaseFunctionLibrary::GetBoundsPoints(AActor* InActor, TArray<FVector>&
 		FVector(Max.X, Min.Y, Max.Z),
 		Max
 	};
+}
+
+APostProcessVolume* UGameBaseFunctionLibrary::GetMainPostProcessVolume(UObject* InWorldContextObject)
+{
+	check(InWorldContextObject);
+	check(InWorldContextObject->GetWorld());
+
+	static APostProcessVolume* Result = nullptr;
+	if (Result != nullptr)
+		return Result;
+
+	for(TActorIterator<APostProcessVolume> Iterator(InWorldContextObject->GetWorld()); Iterator; ++Iterator)
+	{
+		if(Result == nullptr)
+			Result = *Iterator;
+
+		if ((*Iterator)->ActorHasTag(FName(TEXT("Main"))))
+		{
+			Result = *Iterator;
+			break;
+		}
+	}
+
+	return Result;
 }
 
 FBox UGameBaseFunctionLibrary::Encompass(const FBox& InSource, const FVector& InPoint) const

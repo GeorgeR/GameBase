@@ -1,4 +1,4 @@
-#include "GameBase.h"
+#include "GameBaseModule.h"
 
 #define LOCTEXT_NAMESPACE "FGameBaseModule"
 

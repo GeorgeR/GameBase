@@ -5,14 +5,12 @@
 #include "Kismet/GameplayStatics.h"
 #include "Engine/World.h"
 #include "UObjectIterator.h"
-
-#if WITH_EDITOR
-#include "KismetEditorUtilities.h"
-#endif
+#include "Engine/PostProcessVolume.h"
+#include "EngineUtils.h"
 
 #include "GameBaseFunctionLibrary.generated.h"
 
-UCLASS()
+UCLASS(BlueprintType)
 class GAMEBASE_API UGameBaseFunctionLibrary 
 	: public UBlueprintFunctionLibrary
 {
@@ -70,8 +68,14 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "GameBase")
 	static void GetBoundsPoints(AActor* InActor, TArray<FVector>& OutVertices);
 
+	UFUNCTION(BlueprintCallable, Category = "GameBase", meta = (WorldContext = "InWorldContextObject"))
+	static APostProcessVolume* GetMainPostProcessVolume(UObject* InWorldContextObject);
+
+	template <typename TActor>
+	static void ForEachActor(UObject* InWorldContextObject, TFunction<void(TActor*)> InFunc);
+
 	template <typename TComponent>
-	static bool ForComponent(AActor* InActor, TFunction<void(TComponent*)> InFunc);
+	static bool ForEachComponent(AActor* InActor, TFunction<void(TComponent*)> InFunc);
 
 	template <typename TClass>
 	static TArray<TClass*> FindAllInherited(TSubclassOf<TClass> InBaseClass);
@@ -223,8 +227,18 @@ FName UGameBaseFunctionLibrary::GetEnumName(const FName InEnumName, const T InVa
 	return Result;
 }
 
+template <typename TActor>
+void UGameBaseFunctionLibrary::ForEachActor(UObject* InWorldContextObject, TFunction<void(TActor*)> InFunc)
+{
+	check(InWorldContextObject);
+	check(InWorldContextObject->GetWorld());
+
+	for (TActorIterator<TActor> Iterator(InWorldContextObject->GetWorld()); Iterator; ++Iterator)
+		InFunc(*Iterator);
+}
+
 template <typename TComponent>
-bool UGameBaseFunctionLibrary::ForComponent(AActor* InActor, TFunction<void(TComponent*)> InFunc)
+bool UGameBaseFunctionLibrary::ForEachComponent(AActor* InActor, TFunction<void(TComponent*)> InFunc)
 {
 	check(InActor);
 
