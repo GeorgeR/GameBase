@@ -47,7 +47,7 @@ UMaterialFunctionInterface* UGameBaseEditorFunctionLibrary::ConvertMaterialToMat
 
 	auto PackageName = Path + "MF_" + FileName;
 
-	UE_LOG(LogTemp, Warning, PackageName);
+	//UE_LOG(LogTemp, Warning, *PackageName);
 	
 	auto Package = CreatePackage(nullptr, *PackageName);
 
