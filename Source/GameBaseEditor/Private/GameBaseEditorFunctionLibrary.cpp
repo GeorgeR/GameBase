@@ -47,11 +47,11 @@ UMaterialFunctionInterface* UGameBaseEditorFunctionLibrary::ConvertMaterialToMat
 
 	auto PackageName = Path + "MF_" + FileName;
 
-	UE_LOG(LogTemp, Warning, PackageName);
+	UE_LOG(LogTemp, Warning, TEXT("%s"), *PackageName);
 	
 	auto Package = CreatePackage(nullptr, *PackageName);
 
-	auto DestinationFunction = NewObject<UMaterialFunction>(Package);
+	auto DestinationFunction = NewObject<UMaterialFunction>(Package, FName(*FileName), EObjectFlags::RF_Public | EObjectFlags::RF_Standalone);
 
 	auto MakeMaterialAttributesExpression = Cast<UMaterialExpressionMakeMaterialAttributes>(UMaterialEditingLibrary::CreateMaterialExpressionInFunction(DestinationFunction, UMaterialExpressionMakeMaterialAttributes::StaticClass()));
 	MakeMaterialAttributesExpression->AmbientOcclusion = AmbientOcclusion;
@@ -74,8 +74,16 @@ UMaterialFunctionInterface* UGameBaseEditorFunctionLibrary::ConvertMaterialToMat
 	MakeMaterialAttributesExpression->WorldPositionOffset = WorldPositionOffset;
 
 	auto OutputExpression = Cast<UMaterialExpressionFunctionOutput>(UMaterialEditingLibrary::CreateMaterialExpressionInFunction(DestinationFunction, UMaterialExpressionFunctionOutput::StaticClass()));
+
+	OutputExpression->GetInput(0)->Connect(0, MakeMaterialAttributesExpression);
 	
 	UMaterialEditingLibrary::UpdateMaterialFunction(DestinationFunction);
+
+	DestinationFunction->MarkPackageDirty();
+
+	auto FilePath = PackageName.Replace(TEXT("/Game/"), *FPaths::ProjectContentDir()) + *FPackageName::GetAssetPackageExtension();
+	// BUG: This crashes here "Graph is linked to private object(s) in an external package."
+	//bool bSuccess = UPackage::SavePackage(Package, DestinationFunction, EObjectFlags::RF_Standalone, *FilePath);
 
 	return DestinationFunction;
 }
@@ -99,8 +107,8 @@ FString UGameBaseEditorFunctionLibrary::GetPackageName_Split(UObject* InObject, 
 	if (PathName.Split(TEXT(" "), &Left, &Right))
 		PathName = Right;
 
-	if (PathName.StartsWith(TEXT("/Game/")))
-		PathName = PathName.Replace(TEXT("/Game/"), *FPaths::ProjectContentDir());
+	//if (PathName.StartsWith(TEXT("/Game/")))
+	//	PathName = PathName.Replace(TEXT("/Game/"), *FPaths::ProjectContentDir());
 
 	OutPath = PathName + "/";
 	OutFileName = FileName;

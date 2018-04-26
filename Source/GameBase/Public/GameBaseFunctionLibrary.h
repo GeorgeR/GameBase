@@ -44,6 +44,10 @@ public:
 	template <typename TComponent>
 	static TArray<TComponent*> GetComponents(const AActor* InActor);
 
+	/* Returns the first object - the actor or one of it's components that implements or inherits TClass */
+	template <typename TClass>
+	static TClass* GetActorOrComponent(AActor* InActor, UObject*& OutObject);
+
 	UFUNCTION(BlueprintCallable, Category = "GameBase", meta = (WorldContext = "InWorldContextObject"))
 	static FVector2D GetMousePosition(UObject* InWorldContextObject);
 	
@@ -206,6 +210,30 @@ TArray<TComponent*> UGameBaseFunctionLibrary::GetComponents(const AActor* InActo
 		Result.Add(Cast<TComponent>(Component));
 
 	return Result;
+}
+
+template<typename TClass>
+inline TClass * UGameBaseFunctionLibrary::GetActorOrComponent(AActor* InActor, UObject*& OutObject)
+{
+	auto Result = Cast<TClass>(InActor);
+	if (Result != nullptr)
+	{
+		OutObject = InActor;
+		return Result;
+	}
+	
+	TSet<UActorComponent*> Components = InActor->GetComponents();
+	for (auto& Component : Components)
+	{
+		Result = Cast<TClass>(Component);
+		if (Result != nullptr)
+		{
+			OutObject = Component;
+			return Result;
+		}
+	}
+
+	return nullptr;
 }
 
 template <typename T>

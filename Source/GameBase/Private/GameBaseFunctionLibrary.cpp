@@ -113,7 +113,7 @@ APostProcessVolume* UGameBaseFunctionLibrary::GetMainPostProcessVolume(UObject* 
 	check(InWorldContextObject->GetWorld());
 
 	static APostProcessVolume* Result = nullptr;
-	if (Result != nullptr)
+	if (Result != nullptr && IsValid(Result))
 		return Result;
 
 	for(TActorIterator<APostProcessVolume> Iterator(InWorldContextObject->GetWorld()); Iterator; ++Iterator)

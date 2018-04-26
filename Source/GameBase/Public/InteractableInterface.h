@@ -17,6 +17,10 @@ class GAMEBASE_API IInteractableInterface
 	GENERATED_BODY()
 
 public:
+	/* For mouse-over highlighting */
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "GameBase")
+	bool TestInteract(const TScriptInterface<class IInteractorInterface>& InInteractor);
+
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "GameBase")
 	bool CanInteract(const TScriptInterface<class IInteractorInterface>& InInteractor);
 
