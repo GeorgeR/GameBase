@@ -163,7 +163,7 @@ T* UGameBaseFunctionLibrary::GetPlayerControllerAs(UObject* InWorldContextObject
 
 	T* Result = nullptr;
 
-	UGameInstance* GameInstance = GetGameInstanceAs<UGameInstance>(InWorldContextObject);
+	auto GameInstance = GetGameInstanceAs<UGameInstance>(InWorldContextObject);
 	if (GameInstance == nullptr)
 		Result = Cast<T>(UGameplayStatics::GetPlayerController(InWorldContextObject, 0));
 	else
