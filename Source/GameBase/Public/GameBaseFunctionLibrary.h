@@ -81,6 +81,12 @@ public:
 	template <typename TComponent>
 	static bool ForEachComponent(AActor* InActor, TFunction<void(TComponent*)> InFunc);
 
+    template <typename TActor>
+    static TActor* GetFirst(UObject* InWorldContextObject);
+
+    template <typename TActor>
+    static TActor* GetFirst(UObject* InWorldContextObject, TFunction<bool(TActor*)> Func);
+
 	template <typename TClass>
 	static TArray<TClass*> FindAllInherited(TSubclassOf<TClass> InBaseClass);
 
@@ -277,6 +283,31 @@ bool UGameBaseFunctionLibrary::ForEachComponent(AActor* InActor, TFunction<void(
 	InFunc(Component);
 
 	return true;
+}
+
+template <typename TActor>
+TActor* UGameBaseFunctionLibrary::GetFirst(UObject* InWorldContextObject)
+{
+    check(InWorldContextObject);
+    check(InWorldContextObject->GetWorld());
+
+    for (TActorIterator<TActor> Iterator(InWorldContextObject->GetWorld()); Iterator; ++Iterator)
+        return *Iterator;
+
+    return nullptr;
+}
+
+template <typename TActor>
+TActor* UGameBaseFunctionLibrary::GetFirst(UObject* InWorldContextObject, TFunction<bool(TActor*)> Func)
+{
+    check(InWorldContextObject);
+    check(InWorldContextObject->GetWorld());
+
+    for (TActorIterator<TActor> Iterator(InWorldContextObject->GetWorld()); Iterator; ++Iterator)
+        if (InFunc(*Iterator))
+            return *Iterator;
+
+    return nullptr;
 }
 
 template <typename TClass>
