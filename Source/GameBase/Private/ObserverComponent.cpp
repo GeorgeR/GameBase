@@ -21,8 +21,11 @@ void UObserverComponent::TickComponent(float DeltaTime, enum ELevelTick TickType
 
     if (!World->IsGameWorld())
     {
-        auto View = IStreamingManager::Get().GetViewInformation(0);
-        Location = View.ViewOrigin;
+        if (IStreamingManager::Get().GetNumViews() > 0)
+        {
+            auto View = IStreamingManager::Get().GetViewInformation(0);
+            Location = View.ViewOrigin;
+        }
     }
     else
 #endif
