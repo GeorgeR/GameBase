@@ -5,16 +5,6 @@ public class GameBase : ModuleRules
 	public GameBase(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
-		
-		PublicIncludePaths.AddRange(
-			new string[] {
-				"GameBase/Public"
-			});
-
-		PrivateIncludePaths.AddRange(
-			new string[] {
-				"GameBase/Private",
-			});
 
 		PublicDependencyModuleNames.AddRange(
 			new string[]
@@ -37,6 +27,11 @@ public class GameBase : ModuleRules
 			});
 
 	    if (Target.bBuildEditor == true)
-	        PrivateDependencyModuleNames.AddRange(new string[] { "UnrealEd", "ContentBrowser" });
+	        PrivateDependencyModuleNames.AddRange(
+	            new string[]
+	            {
+	                "UnrealEd",
+	                "ContentBrowser"
+	            });
     }
 }
