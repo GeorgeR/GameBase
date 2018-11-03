@@ -5,16 +5,19 @@ public class GameBase : ModuleRules
 	public GameBase(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
-		
-		PublicIncludePaths.AddRange(
-			new string[] {
-				"GameBase/Public"
-			});
 
-		PrivateIncludePaths.AddRange(
-			new string[] {
-				"GameBase/Private",
-			});
+	    if (Target.Version.MinorVersion <= 19)
+	    {
+            PublicIncludePaths.AddRange(
+			    new string[] {
+				    "GameBase/Public"
+			    });
+
+		    PrivateIncludePaths.AddRange(
+			    new string[] {
+				    "GameBase/Private",
+			    });
+        }
 
 		PublicDependencyModuleNames.AddRange(
 			new string[]
