@@ -11,7 +11,7 @@ class UTreeNodeInterface
 	GENERATED_BODY()
 };
 
-/* Generic tree strucuture node. */
+/* Generic tree strucuture Node. */
 class GAMEBASE_API ITreeNodeInterface
 {
 	GENERATED_BODY()
