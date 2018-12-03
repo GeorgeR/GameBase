@@ -30,7 +30,9 @@ void UObserverComponent::TickComponent(float DeltaTime, enum ELevelTick TickType
     else
 #endif
     {
-        Location = GetCharacterTransform(this)->GetComponentLocation();
+        auto Character = GetCharacterTransform(this);
+        if(Character != nullptr)
+            Location = Character->GetComponentLocation();
     }
 
     this->SetWorldLocation(Location);
