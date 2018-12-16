@@ -65,7 +65,7 @@ public:
 	inline const FVector GetEnd() const { return Start + (Direction * GetRange()); }
 	inline const float GetRange() const { return DamageInfo.Range; }
 
-	FProjectileParams() { }
+    FProjectileParams() = default;
 	FProjectileParams(FDamageInfo& InDamageInfo, FVector InStart, FVector InDirection);
 };
 

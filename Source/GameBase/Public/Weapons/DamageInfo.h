@@ -16,8 +16,17 @@ struct GAMEBASE_API FDamageInfo
 	GENERATED_BODY()
 
 public:
-	FDamageInfo() { }
-	
+	FDamageInfo() 
+        : Damage(0),
+        Force(0),
+        Location(FVector()),
+        Direction(FVector()),
+        Falloff(0),
+        Range(0),
+        Spread(0),
+        bIsExplosive(false),
+        DamageType(EForceInit::ForceInitToZero) { }
+
 	/* Pointer to the dealer. */
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	TScriptInterface<IDamageDealerInterface> Dealer;
