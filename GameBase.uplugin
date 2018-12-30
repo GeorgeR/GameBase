@@ -16,7 +16,7 @@
 	"Modules": [
 		{
 			"Name": "GameBase",
-			"Type": "Developer",
+			"Type": "Runtime",
 			"LoadingPhase": "Default"
 		},
 		{

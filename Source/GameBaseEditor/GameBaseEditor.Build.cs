@@ -29,18 +29,12 @@ public class GameBaseEditor : ModuleRules
 			new string[]
 			{
                 "AssetRegistry",
-			    "ContentBrowser",
                 "CoreUObject",
 				"Engine",
                 "MaterialEditor",
 				"Slate",
 				"SlateCore",
 				"UnrealEd"
-			});
-
-		DynamicallyLoadedModuleNames.AddRange(
-			new string[]
-			{
 			});
     }
 }

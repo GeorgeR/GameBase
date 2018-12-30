@@ -5,7 +5,10 @@
 
 #include "DamageReceiverInterface.generated.h"
 
-DECLARE_DYNAMIC_DELEGATE_ThreeParams(FOnDamageReceiverDamaged, const TScriptInterface<IDamageDealerInterface>&, InDamageDealer, const class UDamageType*, InDamageType, float, InDamage);
+class IDamageDealerInterface;
+class UDamageType;
+
+DECLARE_DYNAMIC_DELEGATE_ThreeParams(FOnDamageReceiverDamaged, const TScriptInterface<IDamageDealerInterface>&, DamageDealer, const class UDamageType*, DamageType, float, InDamage);
 DECLARE_DYNAMIC_DELEGATE(FOnDamageReceiverDestroyed);
 
 UINTERFACE(BlueprintType, Blueprintable, MinimalAPI)
@@ -21,9 +24,13 @@ class GAMEBASE_API IDamageReceiverInterface
 	GENERATED_BODY()
 
 public:
-	/* Applies damage to this object. */
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "GameBase|Damage")
-	float TakeDamage(const TScriptInterface<IDamageDealerInterface>& InDamageDealer, const class UDamageType* InDamageType, float InDamage);
+//	/* Applies damage to this object. */
+//	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "GameBase|Damage")
+//#if WITH_ABILITIES
+//	float TakeDamage(float Damage, const FHitResult& Hit, const struct FGameplayTagContainer& Tags, const TScriptInterface<IDamageDealerInterface>& DamageDealer, AActor* Causer);
+//#else
+//	float TakeDamage(const TScriptInterface<IDamageDealerInterface>& DamageDealer, const UDamageType* DamageType, float InDamage);
+//#endif
 
 	/* Returns an event for when this object takes damage. */
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "GameBase|Damage")

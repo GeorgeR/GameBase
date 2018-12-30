@@ -183,8 +183,8 @@ public:
 			{
 				float Width = FMath::Min(InBounds.Max.X, InPoint.X) - FMath::Max(InBounds.Min.X, InPoint.X);
 				float Height = FMath::Min(InBounds.Max.Y, InPoint.Y) - FMath::Max(InBounds.Min.Y, InPoint.Y);
-				float Depth = FMath::Min(InBounds.Max.Z, InPoint.Z) - FMath::Max(InBounds.Min.Z, InPoint.Z);
-				return Width * Height * Depth;
+				float SubmersionDepth = FMath::Min(InBounds.Max.Z, InPoint.Z) - FMath::Max(InBounds.Min.Z, InPoint.Z);
+				return Width * Height * SubmersionDepth;
 			}
 
 			return 0.0f;
@@ -196,8 +196,8 @@ public:
 			{
 				float Width = FMath::Min(InBoxRight.Max.X, InBoxLeft.Max.X) - FMath::Max(InBoxRight.Min.X, InBoxLeft.Min.X);
 				float Height = FMath::Min(InBoxRight.Max.Y, InBoxLeft.Max.Y) - FMath::Max(InBoxRight.Min.Y, InBoxLeft.Min.Y);
-				float Depth = FMath::Min(InBoxRight.Max.Z, InBoxLeft.Max.Z) - FMath::Max(InBoxRight.Min.Z, InBoxLeft.Min.Z);
-				return Width * Height * Depth;
+				float SubmersionDepth = FMath::Min(InBoxRight.Max.Z, InBoxLeft.Max.Z) - FMath::Max(InBoxRight.Min.Z, InBoxLeft.Min.Z);
+				return Width * Height * SubmersionDepth;
 			}
 
 			return 0.0f;

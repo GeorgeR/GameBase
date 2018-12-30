@@ -19,8 +19,8 @@ public:
 	FDamageInfo() 
         : Damage(0),
         Force(0),
-        Location(FVector()),
-        Direction(FVector()),
+        Location(FVector(EForceInit::ForceInitToZero)),
+        Direction(FVector(EForceInit::ForceInitToZero)),
         Falloff(0),
         Range(0),
         Spread(0),
