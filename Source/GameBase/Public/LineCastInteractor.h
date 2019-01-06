@@ -14,17 +14,25 @@ class GAMEBASE_API ULineCastInteractor
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Interactor", meta = (Absolute))
 	float Range;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Interactor")
+	TEnumAsByte<ECollisionChannel> CollisionChannel;
 
 	ULineCastInteractor();
 
 	void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	bool TestInteract_Implementation() override;
+	bool TestInteract_Implementation(TScriptInterface<IInteractableInterface>& Interactable) override;
+	bool TryInteract_Implementation(TScriptInterface<IInteractableInterface>& Interactable) override;
+	bool GetTransform_Implementation(FVector& Location, FRotator& Rotation, FVector& Direction) const override;
+	/*bool TestInteract_Implementation() override;
 	bool TryInteract_Implementation() override;
-	FVector GetTraceOrigin_Implementation() override;
+	FVector GetTraceOrigin_Implementation() override;*/
 
 private:
 	APlayerController* GetPlayerController() const;
+
+	bool DoLineTrace(TFunction<bool(FHitResult&)> Func, TScriptInterface<IInteractableInterface>& Interactable);
 };

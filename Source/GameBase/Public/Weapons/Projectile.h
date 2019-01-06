@@ -35,8 +35,12 @@ public:
 	uint8 DamageEventClassID;
 	
 	FDamageHit()
-		: Dealer(nullptr),
-		Damage(0.0f) { }
+		: DamageEvent(),
+		PointDamageEvent(),
+		RadialDamageEvent(),
+		Dealer(nullptr),
+		Damage(0.0f),
+		DamageEventClassID(0) { }
 	
 	FDamageEvent& GetDamageEvent();
 };

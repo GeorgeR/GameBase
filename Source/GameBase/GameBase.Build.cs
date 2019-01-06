@@ -6,9 +6,6 @@ public class GameBase : ModuleRules
 	{
 		PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
 
-        /* Use Gameplay Abilities */
-        PublicDefinitions.Add("WITH_ABILITIES=1");
-
         if (Target.Version.MinorVersion <= 19)
 	    {
             PublicIncludePaths.AddRange(
@@ -34,15 +31,6 @@ public class GameBase : ModuleRules
 				"Slate",
 				"SlateCore",
 			});
-
-        if (PublicDefinitions.Contains("WITH_ABILITIES=1"))
-        {
-            PublicDependencyModuleNames.AddRange(
-                new string[]
-                {
-                    "GameplayAbilities"
-                });
-        }
 
         if (Target.bBuildEditor == true)
 	        PrivateDependencyModuleNames.AddRange(new string[] { "UnrealEd", "ContentBrowser" });

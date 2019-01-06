@@ -5,6 +5,8 @@
 
 #include "InteractableInterface.generated.h"
 
+class IInteractorInterface;
+
 UINTERFACE(MinimalAPI)
 class UInteractableInterface 
 	: public UInterface
@@ -18,12 +20,17 @@ class GAMEBASE_API IInteractableInterface
 
 public:
 	/* For mouse-over highlighting */
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "GameBase")
-	bool TestInteract(const TScriptInterface<class IInteractorInterface>& InInteractor);
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "GameBase|Interaction")
+	bool TestInteract(const TScriptInterface<IInteractorInterface>& Interactor) const;
+	virtual bool TestInteract_Implementation(const TScriptInterface<IInteractorInterface>& Interactor) const = 0;
 
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "GameBase")
-	bool CanInteract(const TScriptInterface<class IInteractorInterface>& InInteractor);
+	/* Checks if the Interactor can actually interact with this item */
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "GameBase|Interaction")
+	bool CanInteract(const TScriptInterface<IInteractorInterface>& Interactor) const;
+	virtual bool CanInteract_Implementation(const TScriptInterface<IInteractorInterface>& Interactor) const = 0;
 
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "GameBase")
-	void Interact(const TScriptInterface<class IInteractorInterface>& InInteractor);
+	/* Perform the interaction */
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "GameBase|Interaction")
+	void Interact(const TScriptInterface<IInteractorInterface>& Interactor);
+	virtual void Interact_Implementation(const TScriptInterface<IInteractorInterface>& Interactor) = 0;
 };
