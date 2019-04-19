@@ -5,7 +5,9 @@ void UBulletProjectileSpawner::Fire_Implementation(const FProjectileParams& Para
 {
 	FCollisionQueryParams CollisionParams;
 	CollisionParams.AddIgnoredActors(Params.IgnoredActors);
+#if ENGINE_MINOR_VERSION <= 21
 	CollisionParams.bTraceAsyncScene = true;
+#endif
 	CollisionParams.bReturnPhysicalMaterial = true;
 
 	FHitResult HitResult;
