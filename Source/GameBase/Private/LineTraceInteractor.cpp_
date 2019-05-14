@@ -1,0 +1,166 @@
+#include "LineTraceInteractor.h"
+
+#include "Engine/World.h"
+
+#include "InteractableInterface.h"
+
+ULineTraceInteractor::ULineTraceInteractor()
+{
+    TraceRange = 1024.0f;
+
+    TraceDelegate.BindRaw(&ULineTraceInteractor::HandleTraceComplete);
+}
+
+bool ULineTraceInteractor::IsReadyForTest(UWorld* World)
+{
+    ensure(World);
+
+    if (World->IsTraceHandleValid(LastTraceHandle, false))
+        return false;
+}
+
+// Returns false if already running test
+bool ULineTraceInteractor::TryTest(UWorld* World, const FVector& Start, const FVector& Direction)
+{
+    ensure(World);
+
+    if (!IsReadyForTest(World))
+        return false;
+    
+    bool bTraceComplex = true;
+
+    auto QueryParams = FCollisionQueryParams(bTraceComplex);
+    
+    LastTraceHandle = World->AsyncLineTraceByChannel(
+        EAsyncTraceType::Single, 
+        Start, 
+        Start + (Direction * TraceRange), 
+        TraceChannel, 
+        QueryParams,
+        FCollisionResponseParams::DefaultResponseParam, 
+        &TraceDelegate);
+
+    return true;
+}
+
+void ULineTraceInteractor::HandleTraceComplete(const FTraceHandle& TraceHandle, FTraceDatum& TraceData)
+{
+    ensure(TraceHandle == LastTraceHandle); // ensure this is the expected trace
+
+    bool bWasInteractableHit = false;
+    TScriptInterface<IInteractableInterface> Interactable = nullptr;
+
+    for (auto& Hit : TraceData.OutHits)
+    {
+        auto HitActor = Hit.GetActor();
+        if (HitActor != nullptr)
+        {
+            if (HitActor->GetClass()->ImplementsInterface(UInteractableInterface::StaticClass()))
+            {
+                bWasInteractableHit = true;
+                Interactable = HitActor;
+                break;
+            }
+        }
+    }
+
+    OnTraceComplete.Broadcast(bWasInteractableHit, Interactable);
+
+    LastTraceHandle._Data.FrameNumber = 0;
+}
+//
+//void ULineCastInteractor::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+//{
+//	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+//
+//	//TScriptInterface<IInteractableInterface> Interactable;
+//    // TODO: Call via interface, not directly
+//	//TestInteract(Interactable);
+//}
+//
+//bool ULineCastInteractor::TestInteract_Implementation(TScriptInterface<IInteractableInterface>& Interactable)
+//{
+//	return DoLineTrace([this, &Interactable](FHitResult& HitResult) -> bool {
+//        if (IInteractableInterface::Execute_CanInteract(Interactable.GetObject(), this))
+//            IInteractableInterface::Execute_CanInteract(Interactable.GetObject(), this);
+//	
+//		return true;
+//	}, Interactable);
+//}
+//
+//bool ULineCastInteractor::TryInteract_Implementation(TScriptInterface<IInteractableInterface>& Interactable)
+//{
+//	return DoLineTrace([this, &Interactable](FHitResult& HitResult) -> bool {
+//        return IInteractableInterface::Execute_TestInteract(Interactable.GetObject(), this);
+//	}, Interactable);
+//}
+//
+//bool ULineCastInteractor::GetTransform_Implementation(FVector& Location, FRotator& Rotation, FVector& Direction) const
+//{
+//	auto PlayerController = GetPlayerController();
+//	if (PlayerController != nullptr)
+//	{
+//		GetPlayerController()->PlayerCameraManager->GetCameraViewPoint(Location, Rotation);
+//		Direction = Rotation.Vector();
+//
+//		return true;
+//	}
+//
+//	return false;
+//}
+//
+//APlayerController* ULineCastInteractor::GetPlayerController() const
+//{
+//	return Cast<APlayerController>(Cast<APawn>(GetOuter())->GetController());
+//}
+//
+//bool ULineCastInteractor::DoLineTrace(TFunction<bool(FHitResult&)> Func, TScriptInterface<IInteractableInterface>& Interactable)
+//{
+//	FVector Location;
+//	FRotator Rotation;
+//	FVector Direction;
+//	if (!GetTransform(Location, Rotation, Direction))
+//		return nullptr;
+//
+//	FHitResult HitResult;
+//	if (GetWorld()->LineTraceSingleByChannel(HitResult, Location, Location + (Direction * Range), CollisionChannel))
+//	{
+//		/*UObject* InterfaceObject;
+//		Interactable = nullptr;*/
+//		// TODO
+//		//Interactable = UGameBaseFunctionLibrary::GetActorOrComponent<IInteractableInterface>(HitResult.GetActor(), InterfaceObject);
+//		if (Interactable == nullptr)
+//			return false;
+//
+//		return Func(HitResult);
+//	}
+//
+//	return false;
+//}
+
+UAsyncLineTrace* UAsyncLineTrace::AsyncLineTrace(const UObject* WorldContextObject, const FVector& Start, const FVector& End, FHitResult& OutHitResult, bool& OutWasHit)
+{
+    auto BlueprintNode = NewObject<UAsyncLineTrace>();
+    BlueprintNode->WorldContextObject = WorldContextObject;
+    BlueprintNode->Start = Start;
+    BlueprintNode->End = End;
+
+    return BlueprintNode;
+}
+
+void UAsyncLineTrace::Activate()
+{
+    bool bTraceComplex = true;
+
+    auto QueryParams = FCollisionQueryParams(bTraceComplex);
+
+    auto World = WorldContextObject->GetWorld();
+    TraceHandle = World->AsyncLineTraceByChannel(
+        EAsyncTraceType::Single,
+        Start,
+        End,
+        TraceChannel,
+        QueryParams,
+        FCollisionResponseParams::DefaultResponseParam,
+        &TraceDelegate);
+}
