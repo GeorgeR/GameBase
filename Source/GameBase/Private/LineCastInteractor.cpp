@@ -15,16 +15,17 @@ void ULineCastInteractor::TickComponent(float DeltaTime, ELevelTick TickType, FA
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	TScriptInterface<IInteractableInterface> Interactable;
-	TestInteract(Interactable);
+	//TScriptInterface<IInteractableInterface> Interactable;
+    // TODO: Call via interface, not directly
+	//TestInteract(Interactable);
 }
 
 bool ULineCastInteractor::TestInteract_Implementation(TScriptInterface<IInteractableInterface>& Interactable)
 {
 	return DoLineTrace([this, &Interactable](FHitResult& HitResult) -> bool {
-		if (Interactable->CanInteract(this))
-			Interactable->Interact(this);
-
+        if (IInteractableInterface::Execute_CanInteract(Interactable.GetObject(), this))
+            IInteractableInterface::Execute_CanInteract(Interactable.GetObject(), this);
+	
 		return true;
 	}, Interactable);
 }
@@ -32,14 +33,13 @@ bool ULineCastInteractor::TestInteract_Implementation(TScriptInterface<IInteract
 bool ULineCastInteractor::TryInteract_Implementation(TScriptInterface<IInteractableInterface>& Interactable)
 {
 	return DoLineTrace([this, &Interactable](FHitResult& HitResult) -> bool {
-		return Interactable->TestInteract(this);
+        return IInteractableInterface::Execute_TestInteract(Interactable.GetObject(), this);
 	}, Interactable);
 }
 
 bool ULineCastInteractor::GetTransform_Implementation(FVector& Location, FRotator& Rotation, FVector& Direction) const
 {
 	auto PlayerController = GetPlayerController();
-
 	if (PlayerController != nullptr)
 	{
 		GetPlayerController()->PlayerCameraManager->GetCameraViewPoint(Location, Rotation);
