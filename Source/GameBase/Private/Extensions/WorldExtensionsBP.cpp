@@ -5,7 +5,7 @@
 
 AActor* UWorldExtensions::GetFirst(UObject* WorldContextObject, TSubclassOf<UObject> Class)
 {
-	// TODO:
+	// #todo
 
 
 	return nullptr;

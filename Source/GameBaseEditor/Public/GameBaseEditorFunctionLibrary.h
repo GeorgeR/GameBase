@@ -31,7 +31,7 @@ public:
 		check(InObject);
 		check(InObject->GetClass()->IsChildOf(UObject::StaticClass()));
 
-		// TODO: Check if InPath is a valid path
+		// #todo Check if InPath is a valid path
 		auto Package = CreatePackage(nullptr, *InPath.ToString());
 		auto Asset = DuplicateObject(InObject, Package);
 

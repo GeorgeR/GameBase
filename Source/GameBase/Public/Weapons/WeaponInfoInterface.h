@@ -11,7 +11,7 @@ class UWeaponInfoInterface
 	GENERATED_BODY()
 };
 
-// TODO: Weapon metadata (not the actor)
+// #todo Weapon metadata (not the actor)
 class GAMEBASE_API IWeaponInfoInterface
 {
 	GENERATED_BODY()

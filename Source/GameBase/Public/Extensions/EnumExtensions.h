@@ -55,7 +55,7 @@ FName FEnumExtensions::GetEnumName(const FName EnumName, const TEnum Value)
 template <typename TEnum1, typename TEnum2>
 bool FEnumExtensions::HasFlag(TEnum1 Value, TEnum2 Flag)
 {
-	// TODO: Check that its an actual enum
+	// #todo Check that its an actual enum
 
 	return ((Value & StaticCast<uint8>(Flag))) == StaticCast<uint8>(Flag);
 }

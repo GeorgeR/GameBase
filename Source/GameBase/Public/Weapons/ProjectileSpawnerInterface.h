@@ -15,7 +15,7 @@ class UProjectileSpawnerInterface
 };
 
 /* Generic projectile spawner, can fire and returns an event when hit. */
-/* TODO: Need a way of associating a hit with a fire call. */
+/* #todo Need a way of associating a hit with a fire call. */
 class GAMEBASE_API IProjectileSpawnerInterface
 {
 	GENERATED_BODY()

@@ -207,7 +207,7 @@ float CalculateOptimalSplit(TArray<FRTreeChild*>& SortedAxisList, uint32& InOpti
 		int32 BestK = 0;
 		for(auto Sorting = 0; Sorting < 2; Sorting++)
 		{
-			// TODO: Algo::Sort(SortedAxisList, AxisComparison(Axis, Sorting));
+			// #todo Algo::Sort(SortedAxisList, AxisComparison(Axis, Sorting));
 			for(uint32 k = 1; k < SplitDistributions; k++)
 			{
 				uint32 FirstEntries = (MinNodes - 1) + k;

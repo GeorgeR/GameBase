@@ -21,7 +21,7 @@ UMaterialFunctionInterface* UGameBaseEditorFunctionLibrary::ConvertMaterialToMat
 {
 	check(InSourceMaterial);
 
-	// TODO: Iterate over base Node and get all inputs
+	// #todo Iterate over base Node and get all inputs
 	auto AmbientOcclusion = InSourceMaterial->AmbientOcclusion;
 	auto BaseColor = InSourceMaterial->BaseColor;
 	auto ClearCoat = InSourceMaterial->ClearCoat;
