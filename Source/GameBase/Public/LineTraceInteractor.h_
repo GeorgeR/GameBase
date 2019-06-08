@@ -1,0 +1,72 @@
+#pragma once
+
+#include "CoreMinimal.h"
+#include "Engine/EngineTypes.h"
+#include "WorldCollision.h"
+#include "NoExportTypes.h"
+#include "Kismet/BlueprintAsyncActionBase.h"
+
+#include "InteractorInterface.h"
+#include "InteractableInterface.h"
+
+#include "LineTraceInteractor.generated.h"
+
+class UWorld;
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FAsyncTraceCompletePin);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FTraceCompleteDelegate, bool, bHitInteractable, const TScriptInterface<IInteractableInterface>&, Interactable);
+
+UCLASS()
+class GAMEBASE_API UAsyncLineTrace 
+    : public UBlueprintAsyncActionBase
+{
+	GENERATED_BODY()
+
+public:
+    UPROPERTY(BlueprintAssignable)
+    FAsyncTraceCompletePin Success;
+
+    UPROPERTY(BlueprintAssignable)
+    FAsyncTraceCompletePin Failure;
+
+public:
+    UFUNCTION(BlueprintCallable, Category = "Physics", meta = (BlueprintInternalUseOnly = "true", WorldContext = "InWorldContextObject"))
+    static UAsyncLineTrace* AsyncLineTrace(
+        UPARAM(DisplayName = "WorldContextObject") const UObject* InWorldContextObject, 
+        UPARAM(DisplayName = "Start") const FVector& InStart, 
+        UPARAM(DisplayName = "End") const FVector& InEnd, 
+        UPARAM(DisplayName = "Hit") FHitResult& OutHitResult,
+        UPARAM(DisplayName = "Result") bool& OutWasHit);
+
+    virtual void Activate() override;
+
+private:
+    const UObject* WorldContextObject;
+    FVector Start;
+    FVector End;
+
+    
+        
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Trace", meta = (Absolute))
+	float TraceRange;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Trace")
+	TEnumAsByte<ECollisionChannel> TraceChannel;
+
+    UPROPERTY(BlueprintAssignable, Category = "Trace")
+    FTraceCompleteDelegate OnTraceComplete;
+
+    ULineTraceInteractor();
+
+    UFUNCTION(BlueprintCallable, BlueprintPure, Category = "GameBase|Interaction")
+    bool IsReadyForTest(UWorld* World);
+
+    UFUNCTION(BlueprintCallable, Category = "GameBase|Interaction")
+    bool TryTest(UWorld* World, const FVector& Start, const FVector& Direction);
+
+protected:
+    FTraceHandle TraceHandle;
+    FTraceDelegate TraceDelegate;
+    virtual void HandleTraceComplete(const FTraceHandle& TraceHandle, FTraceDatum& TraceData);
+};
