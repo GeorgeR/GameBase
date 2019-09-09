@@ -21,5 +21,5 @@ class GAMEBASE_API IInteractorInterface
 public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "GameBase|Interaction")
 	bool GetTransform(FVector& Location, FRotator& Rotation, FVector& Direction) const;
-	virtual bool GetTransform_Implementation(FVector& Location, FRotator& Rotation, FVector& Direction) const = { return false; }
+	virtual bool GetTransform_Implementation(FVector& Location, FRotator& Rotation, FVector& Direction) const { return false; }
 };
