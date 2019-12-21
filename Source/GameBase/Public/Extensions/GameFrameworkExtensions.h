@@ -2,6 +2,8 @@
 
 #include "CoreMinimal.h"
 
+#include "Kismet/GameplayStatics.h"
+
 class GAMEBASE_API FGameFrameworkExtensions
 {
 public:
