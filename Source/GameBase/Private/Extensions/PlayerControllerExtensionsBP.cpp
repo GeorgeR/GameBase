@@ -1,6 +1,6 @@
-#include "PlayerControllerExtensionsBP.h"
+#include "Extensions/PlayerControllerExtensionsBP.h"
 
-#include "PlayerControllerExtensions.h"
+#include "Extensions/PlayerControllerExtensions.h"
 
 FVector2D UPlayerControllerExtensions::GetMousePosition(UObject* WorldContextObject)
 {

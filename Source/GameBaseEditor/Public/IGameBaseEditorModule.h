@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ModuleInterface.h"
+#include "Modules/ModuleInterface.h"
 
 class GAMEBASEEDITOR_API IGameBaseEditorModule 
 	: public IModuleInterface

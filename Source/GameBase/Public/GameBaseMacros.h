@@ -4,6 +4,7 @@
 
 #if DO_CHECK && !USING_CODE_ANALYSIS
 
+// @todo: document why these are needed?
 #if defined(__GNUC__) || (defined(__MWERKS__) && (__MWERKS__ >= 0x3000)) || \
     (defined(__ICC) && (__ICC >= 600)) || defined(__ghs__)
 #define __FUNC__ __PRETTY_FUNCTION__
@@ -24,8 +25,10 @@
 #define __FUNC__ "(unknown)"
 #endif
 
+/** Descriptive specialization of unimplemented() macro **/
 #define unimplementedFunction() checkf(false, TEXT("Unimplemented Function: %s"), TEXT(__FUNC__))
-// use native unimplemented() macro
+
+/** use native unimplemented() macro **/
 //#define notImplemented(InFormat, ...) UE_ENSURE_IMPL(&, true, false, InFormat, ##__VA_ARGS__)
 
 #endif

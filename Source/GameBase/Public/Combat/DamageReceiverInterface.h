@@ -1,7 +1,7 @@
 #pragma once
 
-#include "DamageInfo.h"
-#include "Projectile.h"
+#include "Weapons/DamageInfo.h"
+#include "Weapons/Projectile.h"
 
 #include "DamageReceiverInterface.generated.h"
 

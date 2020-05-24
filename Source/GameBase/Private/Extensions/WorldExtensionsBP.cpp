@@ -1,6 +1,6 @@
-#include "WorldExtensionsBP.h"
+#include "Extensions/WorldExtensionsBP.h"
 
-#include "WorldExtensions.h"
+#include "Extensions/WorldExtensions.h"
 #include "Engine/PostProcessVolume.h"
 
 AActor* UWorldExtensions::GetFirst(UObject* WorldContextObject, TSubclassOf<UObject> Class)
@@ -16,13 +16,13 @@ APostProcessVolume* UWorldExtensions::GetMainPostProcessVolume(UObject* WorldCon
 	check(WorldContextObject);
 	check(WorldContextObject->GetWorld());
 
-	auto World = WorldContextObject->GetWorld();
+    const auto World = WorldContextObject->GetWorld();
 
 	static TKeyValuePair<UWorld*, APostProcessVolume*> Cached(nullptr, nullptr);
 	if (Cached.Key != nullptr && Cached.Key == World && Cached.Value != nullptr)
 		return Cached.Value;
 
-	auto PostProcessVolume = FWorldExtensions::GetFirst<APostProcessVolume>(WorldContextObject, [](APostProcessVolume* PostProcessVolume) -> bool {
+    const auto PostProcessVolume = FWorldExtensions::GetFirst<APostProcessVolume>(WorldContextObject, [](APostProcessVolume* PostProcessVolume) -> bool {
 		return PostProcessVolume->ActorHasTag(TEXT("Main"));
 	});
 

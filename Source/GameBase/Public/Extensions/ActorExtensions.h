@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Launch/Resources/Version.h"
 
 class GAMEBASE_API FActorExtensions
 {
@@ -31,12 +32,17 @@ TComponent* FActorExtensions::GetComponentOfType(const AActor* Actor)
 }
 
 template <typename TComponent>
-static TArray<TComponent*> FActorExtensions::GetComponentsOfType(const AActor* Actor)
+TArray<TComponent*> FActorExtensions::GetComponentsOfType(const AActor* Actor)
 {
 	check(Actor);
 
 	TArray<TComponent*> Result;
+	TArray<UActorComponent*> Components;
+#if ENGINE_MINOR_VERSION > 23
+	Actor->GetComponents(TComponent::StaticClass(), Components);
+#else
 	auto Components = Actor->GetComponentsByClass(TComponent::StaticClass());
+#endif
 	if (Components.Num() == 0)
 		return Result;
 
@@ -60,7 +66,7 @@ TType* FActorExtensions::GetActorOrComponent(AActor* Actor, UObject*& Object)
 			return Cast<TType>(Object);
 		}
 
-		TSet<UActorComponent*> Components = Actor->GetComponentsOfType();
+        auto Components = Actor->GetComponents();
 		for (auto& Component : Components)
 		{
 			if (Component->Implements<TType>())
@@ -81,7 +87,7 @@ TType* FActorExtensions::GetActorOrComponent(AActor* Actor, UObject*& Object)
 			return Result;
 		}
 
-		TSet<UActorComponent*> Components = Actor->GetComponentsOfType();
+        auto Components = Actor->GetComponents();
 		for (auto& Component : Components)
 		{
 			Result = Cast<TType>(Component);
@@ -101,7 +107,7 @@ bool FActorExtensions::ForEachComponent(AActor* Actor, TFunction<void(TComponent
 {
 	check(Actor);
 
-	TComponent* Component = Cast<TComponent>(Actor->GetComponentByClass(TComponent::StaticClass()));
+    TComponent* Component = Cast<TComponent>(Actor->GetComponentByClass(TComponent::StaticClass()));
 	if (Component == nullptr)
 		return false;
 

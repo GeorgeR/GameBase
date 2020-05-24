@@ -1,9 +1,9 @@
-#include "PlayerControllerExtensions.h"
+#include "Extensions/PlayerControllerExtensions.h"
 
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/PlayerController.h"
-#include "GameFrameworkExtensions.h"
-#include "ActorExtensions.h"
+#include "Extensions/GameFrameworkExtensions.h"
+#include "Extensions/ActorExtensions.h"
 
 FVector2D FPlayerControllerExtensions::GetMousePosition(UObject* WorldContextObject)
 {

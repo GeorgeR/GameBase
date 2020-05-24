@@ -7,7 +7,7 @@
 #include "Materials/MaterialExpressionMakeMaterialAttributes.h"
 #include "Materials/MaterialInstance.h"
 #include "MaterialEditingLibrary.h"
-#include "Paths.h"
+#include "Misc/Paths.h"
 #include "Materials/MaterialExpressionFunctionOutput.h"
 #include "Engine/Engine.h"
 

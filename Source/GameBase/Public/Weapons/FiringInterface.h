@@ -1,7 +1,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "DamageDealerInterface.h"
+#include "UObject/Interface.h"
+#include "Combat/DamageDealerInterface.h"
 
 #include "FiringInterface.generated.h"
 

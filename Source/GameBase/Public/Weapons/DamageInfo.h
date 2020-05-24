@@ -1,9 +1,9 @@
 #pragma once
 
-#include "DamageDealerInterface.h"
-#include "WeaponAmmunitionInterface.h"
-#include "WeaponInfoInterface.h"
-#include "WeaponInfo.h"
+#include "Combat/DamageDealerInterface.h"
+#include "Weapons/WeaponAmmunitionInterface.h"
+#include "Weapons/WeaponInfoInterface.h"
+#include "Weapons/WeaponInfo.h"
 
 #include "DamageInfo.generated.h"
 

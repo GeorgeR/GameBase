@@ -9,11 +9,15 @@ UTargetPointComponent::UTargetPointComponent()
 
     if (Sprite)
     {
-        ConstructorHelpers::FObjectFinder<UTexture2D> SpriteFinder(TEXT("/Engine/EditorMaterials/TargetIcon"));
+        const ConstructorHelpers::FObjectFinder<UTexture2D> SpriteFinder(TEXT("/Engine/EditorMaterials/TargetIcon"));
         if (SpriteFinder.Succeeded())
             Sprite->Sprite = SpriteFinder.Object;
 
+#if ENGINE_MINOR_VERSION >= 24
+        Sprite->SetRelativeScale3D(FVector(0.35f, 0.35f, 0.35f));
+#else
         Sprite->RelativeScale3D = FVector(0.35f, 0.35f, 0.35f);
+#endif
         Sprite->SpriteInfo.Category = TEXT("TargetPoint");
         Sprite->bIsScreenSizeScaled = true;
         Sprite->SetupAttachment(this);

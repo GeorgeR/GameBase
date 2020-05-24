@@ -1,6 +1,6 @@
-#include "StringExtensions.h"
+#include "Extensions/StringExtensions.h"
 
-#include "Regex.h"
+#include "Internationalization/Regex.h"
 
 FString FStringExtensions::GetUppercaseChars(const FString& String)
 {

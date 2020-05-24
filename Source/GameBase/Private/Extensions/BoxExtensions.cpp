@@ -1,4 +1,4 @@
-#include "BoxExtensions.h"
+#include "Extensions/BoxExtensions.h"
 
 FBox FBoxExtensions::Encompass(const FBox& Source, const FVector& Point)
 {

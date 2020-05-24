@@ -1,7 +1,9 @@
-#include "Projectile.h"
-#include "Weapons/ProjectileSpawnerInterface.h"
+#include "Weapons/Projectile.h"
+
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Components/SphereComponent.h"
+
+#include "Weapons/ProjectileSpawnerInterface.h"
 
 FProjectileParams::FProjectileParams(FDamageInfo& InDamageInfo, FVector InStart, FVector InDirection)
 	: DamageInfo(InDamageInfo),

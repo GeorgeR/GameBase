@@ -1,5 +1,9 @@
-#include "BulletProjectileSpawner.h"
+#include "Weapons/BulletProjectileSpawner.h"
+
 #include "DrawDebugHelpers.h"
+#include "CollisionQueryParams.h"
+#include "Engine/World.h"
+#include "Launch/Resources/Version.h"
 
 void UBulletProjectileSpawner::Fire_Implementation(const FProjectileParams& Params)
 {

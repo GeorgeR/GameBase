@@ -1,4 +1,4 @@
-#include "DamageInfo.h"
+#include "Weapons/DamageInfo.h"
 
 bool FDamageInfo::TryHit(UWorld* InWorld, FHitResult& OutHit)
 {

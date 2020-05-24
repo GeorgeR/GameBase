@@ -1,6 +1,6 @@
-#include "MathExtensionsBP.h"
+#include "Extensions/MathExtensionsBP.h"
 
-#include "MathExtensions.h"
+#include "Extensions/MathExtensions.h"
 
 void UMathExtensions::FitViewToBounds(const FBox& Bounds, float& FOV, FTransform& Transform)
 {

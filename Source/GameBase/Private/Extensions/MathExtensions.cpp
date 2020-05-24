@@ -1,4 +1,4 @@
-#include "MathExtensions.h"
+#include "Extensions/MathExtensions.h"
 
 void FMathExtensions::FitViewToBounds(const FBox& Bounds, float& FOV, FTransform& Transform)
 {
