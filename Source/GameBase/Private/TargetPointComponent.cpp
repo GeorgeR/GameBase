@@ -13,7 +13,11 @@ UTargetPointComponent::UTargetPointComponent()
         if (SpriteFinder.Succeeded())
             Sprite->Sprite = SpriteFinder.Object;
 
+#if ENGINE_MINOR_VERSION <= 24
         Sprite->RelativeScale3D = FVector(0.35f, 0.35f, 0.35f);
+#else
+        Sprite->SetRelativeScale3D({ 0.35f, 0.35f, 0.35f });
+#endif
         Sprite->SpriteInfo.Category = TEXT("TargetPoint");
         Sprite->bIsScreenSizeScaled = true;
         Sprite->SetupAttachment(this);
